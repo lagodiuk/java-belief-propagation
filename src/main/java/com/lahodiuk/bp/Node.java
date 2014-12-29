@@ -14,6 +14,10 @@ public abstract class Node {
 
 	private List<Edge> edges = new ArrayList<>();
 
+	public double getLogPriorProbablility(String state) {
+		return Math.log(this.getPriorProbablility(state));
+	}
+
 	public void addEdge(Edge edge) {
 		this.edges.add(edge);
 	}
@@ -25,20 +29,17 @@ public abstract class Node {
 	public Map<String, Double> getPosteriorProbabilities() {
 		Map<String, Double> stateToProbability = new HashMap<String, Double>();
 		for (String state : this.getStates()) {
-			double productOfIncomingMessages = 1;
+			double logProductOfIncomingMessages = 0;
 			for (Edge edge : this.edges) {
-				productOfIncomingMessages *= edge.getIncomingMessage(this, state);
+				logProductOfIncomingMessages += edge.getLogIncomingMessage(this, state);
 			}
-			stateToProbability.put(state, this.getPriorProbablility(state) * productOfIncomingMessages);
+			stateToProbability.put(state, this.getLogPriorProbablility(state) + logProductOfIncomingMessages);
 		}
 
 		// normalize
-		double sum = 0;
-		for (double probability : stateToProbability.values()) {
-			sum += probability;
-		}
+		double sum = Edge.logOfSum(stateToProbability.values());
 		for (String state : stateToProbability.keySet()) {
-			stateToProbability.put(state, stateToProbability.get(state) / sum);
+			stateToProbability.put(state, Math.exp(stateToProbability.get(state) - sum));
 		}
 
 		return stateToProbability;
