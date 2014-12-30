@@ -59,25 +59,14 @@ public class Edge {
 	}
 
 	public void updateMessages() {
-		// node1 -> node2
-		for (String stateOfNode2 : this.node2.getStates()) {
-			List<Double> sumLogParts = new ArrayList<>();
-			for (String stateOfNode1 : this.node1.getStates()) {
-				double logProductOfIncomingMessages = 0;
-				for (Edge edge : this.node1.getEdges()) {
-					if (edge == this) {
-						continue;
-					}
-					logProductOfIncomingMessages += edge.getLogIncomingMessage(this.node1, stateOfNode1);
-				}
-				sumLogParts.add(this.node1.getLogPriorProbablility(stateOfNode1)
-						+ this.potential.getLogValue(stateOfNode1, stateOfNode2, this.edgeType)
-						+ logProductOfIncomingMessages);
-			}
-			this.logNode1ToNode2MessagesNew.put(stateOfNode2, logOfSum(sumLogParts));
-		}
+		this.updateMessagesNode1ToNode2();
+		this.updateMessagesNode2ToNode1();
+	}
 
-		// node2 -> node1
+	/**
+	 * node2 -> node1
+	 */
+	public void updateMessagesNode2ToNode1() {
 		for (String stateOfNode1 : this.node1.getStates()) {
 			List<Double> sumLogParts = new ArrayList<>();
 			for (String stateOfNode2 : this.node2.getStates()) {
@@ -96,17 +85,50 @@ public class Edge {
 		}
 	}
 
-	public void refreshMessages() {
-		// node1 -> node2
-		double sum1 = logOfSum(this.logNode1ToNode2MessagesNew.values());
-		for (String stateOfNode2 : this.logNode1ToNode2MessagesNew.keySet()) {
-			this.logNode1ToNode2Messages.put(stateOfNode2, this.logNode1ToNode2MessagesNew.get(stateOfNode2) - sum1);
+	/**
+	 * node1 -> node2
+	 */
+	public void updateMessagesNode1ToNode2() {
+		for (String stateOfNode2 : this.node2.getStates()) {
+			List<Double> sumLogParts = new ArrayList<>();
+			for (String stateOfNode1 : this.node1.getStates()) {
+				double logProductOfIncomingMessages = 0;
+				for (Edge edge : this.node1.getEdges()) {
+					if (edge == this) {
+						continue;
+					}
+					logProductOfIncomingMessages += edge.getLogIncomingMessage(this.node1, stateOfNode1);
+				}
+				sumLogParts.add(this.node1.getLogPriorProbablility(stateOfNode1)
+						+ this.potential.getLogValue(stateOfNode1, stateOfNode2, this.edgeType)
+						+ logProductOfIncomingMessages);
+			}
+			this.logNode1ToNode2MessagesNew.put(stateOfNode2, logOfSum(sumLogParts));
 		}
+	}
 
-		// node2 -> node1
+	public void refreshMessages() {
+		this.refreshMessagesNode1ToNode2();
+		this.refreshMessagesNode2ToNode1();
+	}
+
+	/**
+	 * node2 -> node1
+	 */
+	public void refreshMessagesNode2ToNode1() {
 		double sum2 = logOfSum(this.logNode2ToNode1MessagesNew.values());
 		for (String stateOfNode1 : this.logNode2ToNode1MessagesNew.keySet()) {
 			this.logNode2ToNode1Messages.put(stateOfNode1, this.logNode2ToNode1MessagesNew.get(stateOfNode1) - sum2);
+		}
+	}
+
+	/**
+	 * node1 -> node2
+	 */
+	public void refreshMessagesNode1ToNode2() {
+		double sum1 = logOfSum(this.logNode1ToNode2MessagesNew.values());
+		for (String stateOfNode2 : this.logNode1ToNode2MessagesNew.keySet()) {
+			this.logNode1ToNode2Messages.put(stateOfNode2, this.logNode1ToNode2MessagesNew.get(stateOfNode2) - sum1);
 		}
 	}
 
