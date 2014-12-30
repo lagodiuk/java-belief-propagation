@@ -100,43 +100,43 @@ public class Coloring {
 			System.out.println();
 		}
 	}
-}
 
-class GraphColorNode extends Node {
+	private static class GraphColorNode extends Node {
 
-	public static final String RED = "red";
-	public static final String GREEN = "green";
-	public static final String BLUE = "blue";
+		public static final String RED = "red";
+		public static final String GREEN = "green";
+		public static final String BLUE = "blue";
 
-	private static final Set<String> COLORS = new HashSet<>();
+		private static final Set<String> COLORS = new HashSet<>();
 
-	static {
-		COLORS.add(RED);
-		COLORS.add(GREEN);
-		COLORS.add(BLUE);
+		static {
+			COLORS.add(RED);
+			COLORS.add(GREEN);
+			COLORS.add(BLUE);
+		}
+
+		@Override
+		public Set<String> getStates() {
+			return COLORS;
+		}
+
+		@Override
+		public double getPriorProbablility(String state) {
+			return 1.0 / COLORS.size();
+		}
 	}
 
-	@Override
-	public Set<String> getStates() {
-		return COLORS;
-	}
+	private static class GraphColorPotential extends Potential {
 
-	@Override
-	public double getPriorProbablility(String state) {
-		return 1.0 / COLORS.size();
-	}
-}
+		private static double EPSILON = 0.000001;
 
-class GraphColorPotential extends Potential {
-
-	private static double EPSILON = 0.000001;
-
-	@Override
-	public double getValue(String node1State, String node2State, String edgeType) {
-		if (node1State == node2State) {
-			return EPSILON;
-		} else {
-			return 1.0 - EPSILON;
+		@Override
+		public double getValue(String node1State, String node2State, String edgeType) {
+			if (node1State == node2State) {
+				return EPSILON;
+			} else {
+				return 1.0 - EPSILON;
+			}
 		}
 	}
 }

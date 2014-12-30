@@ -45,4 +45,17 @@ public abstract class Node {
 		return stateToProbability;
 	}
 
+	public String getMostProbableState() {
+		Map<String, Double> stateToProbability = this.getPosteriorProbabilities();
+		String mostProbableState = null;
+		double mostProbableStateProbability = 0;
+		for (String state : stateToProbability.keySet()) {
+			double probability = stateToProbability.get(state);
+			if (probability > mostProbableStateProbability) {
+				mostProbableState = state;
+				mostProbableStateProbability = probability;
+			}
+		}
+		return mostProbableState;
+	}
 }
