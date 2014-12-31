@@ -31,6 +31,8 @@ public class ChemicalReactionsNetwork {
 				.addReaction(new Reaction().reagents("NaOH", "H2CO3").products("Na2CO3", "H2O"))
 				.addReaction(new Reaction().reagents("LiOH", "H2SO4").products("Li2SO4", "H2O"))
 				.addReaction(new Reaction().reagents("Li2O", "H2O").products("LiOH"))
+				.addReaction(new Reaction().reagents("KOH", "H2SO4").products("KHSO4", "H2O"))
+				.addReaction(new Reaction().reagents("KHSO4", "KOH").products("K2SO4", "H2O"))
 				.inference(10);
 
 		reactionsNetwork.result();
@@ -163,10 +165,9 @@ public class ChemicalReactionsNetwork {
 
 		public void result() {
 			for (String compound : this.compoundToCompoundNode.keySet()) {
-				// System.out.println(compound + "\t" +
-				// this.compoundToCompoundNode.get(compound).getPosteriorProbabilities());
+				System.out.println(compound + "\t" + this.compoundToCompoundNode.get(compound).getPosteriorProbabilities());
 				System.out.println(compound + "\t" + this.compoundToCompoundNode.get(compound).getMostProbableState());
-				// System.out.println();
+				System.out.println();
 			}
 		}
 	}
