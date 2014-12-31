@@ -46,6 +46,10 @@ public class Edge {
 		return edge;
 	}
 
+	public String getEdgeType() {
+		return this.edgeType;
+	}
+
 	public double getLogIncomingMessage(Node node, String state) {
 		if (node == this.node1) {
 			return this.logNode2ToNode1Messages.get(state);
