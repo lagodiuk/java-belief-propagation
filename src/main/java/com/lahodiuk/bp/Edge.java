@@ -67,16 +67,17 @@ public class Edge {
 	 * node2 -> node1
 	 */
 	public void updateMessagesNode2ToNode1() {
+		Map<String, Double> node2StateToLogPriorProbabilityAndProductIncomingMessages =
+				this.node2.getStateToLogPriorProbabilityAndProductIncomingMessages();
+
 		for (String stateOfNode1 : this.node1.getStates()) {
 			List<Double> sumLogParts = new ArrayList<>();
 			for (String stateOfNode2 : this.node2.getStates()) {
-				double logProductOfIncomingMessages = 0;
-				for (Edge edge : this.node2.getEdges()) {
-					if (edge == this) {
-						continue;
-					}
-					logProductOfIncomingMessages += edge.getLogIncomingMessage(this.node2, stateOfNode2);
-				}
+
+				double logProductOfIncomingMessages =
+						node2StateToLogPriorProbabilityAndProductIncomingMessages.get(stateOfNode2)
+								- this.getLogIncomingMessage(this.node2, stateOfNode2);
+
 				sumLogParts.add(this.node2.getLogPriorProbablility(stateOfNode2)
 						+ this.potential.getLogValue(stateOfNode1, stateOfNode2, this.edgeType)
 						+ logProductOfIncomingMessages);
@@ -89,16 +90,17 @@ public class Edge {
 	 * node1 -> node2
 	 */
 	public void updateMessagesNode1ToNode2() {
+		Map<String, Double> node1StateToLogPriorProbabilityAndProductIncomingMessages =
+				this.node1.getStateToLogPriorProbabilityAndProductIncomingMessages();
+
 		for (String stateOfNode2 : this.node2.getStates()) {
 			List<Double> sumLogParts = new ArrayList<>();
 			for (String stateOfNode1 : this.node1.getStates()) {
-				double logProductOfIncomingMessages = 0;
-				for (Edge edge : this.node1.getEdges()) {
-					if (edge == this) {
-						continue;
-					}
-					logProductOfIncomingMessages += edge.getLogIncomingMessage(this.node1, stateOfNode1);
-				}
+
+				double logProductOfIncomingMessages =
+						node1StateToLogPriorProbabilityAndProductIncomingMessages.get(stateOfNode1)
+								- this.getLogIncomingMessage(this.node1, stateOfNode1);
+
 				sumLogParts.add(this.node1.getLogPriorProbablility(stateOfNode1)
 						+ this.potential.getLogValue(stateOfNode1, stateOfNode2, this.edgeType)
 						+ logProductOfIncomingMessages);
