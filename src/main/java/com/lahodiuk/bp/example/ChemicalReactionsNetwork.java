@@ -74,7 +74,7 @@ public class ChemicalReactionsNetwork {
 		private List<Edge<String, String>> edges = new ArrayList<>();
 
 		public ReactionsNetwork addReaction(Reaction reaction) {
-			this.reactionToReactionNode.put(reaction, new ReactionNode());
+			this.reactionToReactionNode.put(reaction, new ReactionNode(reaction.getReagents().size(), reaction.getProducts().size()));
 
 			for (String reagent : reaction.getReagents()) {
 				if (this.compoundToCompoundNode.get(reagent) == null) {
@@ -254,7 +254,11 @@ public class ChemicalReactionsNetwork {
 			PRODUCTS_COUNT_TO_STATES.put(2, new HashSet<>(Arrays.asList(BASE_AND_ACID, BASE_AND_ACIDIC_OXIDE, BASIC_OXIDE_AND_ACID)));
 		}
 
-		private Set<String> statesMatchedByProductsAndReagentsCount = null;
+		private Set<String> mostProbableStatesByProductsAndReagentsCount = null;
+
+		public ReactionNode(int reagentsCount, int productsCount) {
+			this.setMostProbableStatesByReagentsAndProductsCount(reagentsCount, productsCount);
+		}
 
 		@Override
 		public Set<String> getStates() {
@@ -263,49 +267,32 @@ public class ChemicalReactionsNetwork {
 
 		@Override
 		public double getPriorProbablility(String state) {
-			if (this.statesMatchedByProductsAndReagentsCount == null) {
-				this.getMostProbableStatesByReagentsAndProductsCount();
-			}
-
-			if (this.statesMatchedByProductsAndReagentsCount.isEmpty()) {
-				return 1.0 / STATES.size();
+			if (this.mostProbableStatesByProductsAndReagentsCount.contains(state)) {
+				return 1.0 / this.mostProbableStatesByProductsAndReagentsCount.size();
 			} else {
-				if (this.statesMatchedByProductsAndReagentsCount.contains(state)) {
-					return 1.0 / this.statesMatchedByProductsAndReagentsCount.size();
-				} else {
-					return EPSILON;
-				}
+				return EPSILON;
 			}
 		}
 
-		public void getMostProbableStatesByReagentsAndProductsCount() {
-			int reagentsCount = 0;
-			int productsCount = 0;
-			for (Edge<?, ?> edge : this.getEdges()) {
-				if (edge.getPotential() instanceof ReagentReactionCompatibilityPotential) {
-					reagentsCount++;
-					continue;
-				}
-
-				if (edge.getPotential() instanceof ProductReactionCompatibilityPotential) {
-					productsCount++;
-					continue;
-				}
-
-				throw new RuntimeException();
-			}
-
+		public void setMostProbableStatesByReagentsAndProductsCount(int reagentsCount, int productsCount) {
 			Set<String> mostProbableStatesByReagentsCount = REAGENTS_COUNT_TO_STATES.get(reagentsCount);
 			Set<String> mostProbableStatesByProductsCount = PRODUCTS_COUNT_TO_STATES.get(productsCount);
 
-			this.statesMatchedByProductsAndReagentsCount = new HashSet<>();
+			this.mostProbableStatesByProductsAndReagentsCount = new HashSet<>();
 
 			if ((mostProbableStatesByProductsCount != null) && (mostProbableStatesByReagentsCount != null)) {
 				for (String s : mostProbableStatesByProductsCount) {
 					if (mostProbableStatesByReagentsCount.contains(s)) {
-						this.statesMatchedByProductsAndReagentsCount.add(s);
+						this.mostProbableStatesByProductsAndReagentsCount.add(s);
 					}
 				}
+			}
+
+			if (this.mostProbableStatesByProductsAndReagentsCount.isEmpty()) {
+				// TODO Warn
+				System.out.println("Can't find any reactions withs given numbers of products and reagents");
+
+				this.mostProbableStatesByProductsAndReagentsCount = STATES;
 			}
 		}
 	}
