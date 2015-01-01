@@ -4,46 +4,45 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public abstract class Node {
+public abstract class Node<STATES> {
 
-	public abstract Set<String> getStates();
+	public abstract Iterable<STATES> getStates();
 
-	public abstract double getPriorProbablility(String state);
+	public abstract double getPriorProbablility(STATES state);
 
-	private List<Edge> edges = new ArrayList<>();
+	private List<Edge<?, ?>> edges = new ArrayList<>();
 
-	public double getLogPriorProbablility(String state) {
+	public double getLogPriorProbablility(STATES state) {
 		return Math.log(this.getPriorProbablility(state));
 	}
 
-	public void addEdge(Edge edge) {
+	public void addEdge(Edge<?, ?> edge) {
 		this.edges.add(edge);
 	}
 
-	public List<Edge> getEdges() {
+	public List<Edge<?, ?>> getEdges() {
 		return this.edges;
 	}
 
-	public Map<String, Double> getPosteriorProbabilities() {
-		Map<String, Double> stateToLogPriorProbabilityAndProductIncomingMessages =
+	public Map<STATES, Double> getPosteriorProbabilities() {
+		Map<STATES, Double> stateToLogPriorProbabilityAndProductIncomingMessages =
 				this.getStateToLogPriorProbabilityAndProductIncomingMessages();
 
 		// normalize
 		double sum = Edge.logOfSum(stateToLogPriorProbabilityAndProductIncomingMessages.values());
-		for (String state : stateToLogPriorProbabilityAndProductIncomingMessages.keySet()) {
+		for (STATES state : stateToLogPriorProbabilityAndProductIncomingMessages.keySet()) {
 			stateToLogPriorProbabilityAndProductIncomingMessages.put(state, Math.exp(stateToLogPriorProbabilityAndProductIncomingMessages.get(state) - sum));
 		}
 
 		return stateToLogPriorProbabilityAndProductIncomingMessages;
 	}
 
-	public Map<String, Double> getStateToLogPriorProbabilityAndProductIncomingMessages() {
-		Map<String, Double> stateToLogPriorProbabilityAndProductIncomingMessages = new HashMap<String, Double>();
-		for (String state : this.getStates()) {
+	public Map<STATES, Double> getStateToLogPriorProbabilityAndProductIncomingMessages() {
+		Map<STATES, Double> stateToLogPriorProbabilityAndProductIncomingMessages = new HashMap<>();
+		for (STATES state : this.getStates()) {
 			double logProductOfIncomingMessages = 0;
-			for (Edge edge : this.edges) {
+			for (Edge<?, ?> edge : this.edges) {
 				logProductOfIncomingMessages += edge.getLogIncomingMessage(this, state);
 			}
 			stateToLogPriorProbabilityAndProductIncomingMessages.put(state,
@@ -52,11 +51,11 @@ public abstract class Node {
 		return stateToLogPriorProbabilityAndProductIncomingMessages;
 	}
 
-	public String getMostProbableState() {
-		Map<String, Double> stateToProbability = this.getPosteriorProbabilities();
-		String mostProbableState = null;
+	public STATES getMostProbableState() {
+		Map<STATES, Double> stateToProbability = this.getPosteriorProbabilities();
+		STATES mostProbableState = null;
 		double mostProbableStateProbability = 0;
-		for (String state : stateToProbability.keySet()) {
+		for (STATES state : stateToProbability.keySet()) {
 			double probability = stateToProbability.get(state);
 			if (probability > mostProbableStateProbability) {
 				mostProbableState = state;

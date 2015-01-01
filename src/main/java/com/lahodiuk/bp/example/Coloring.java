@@ -1,11 +1,10 @@
 package com.lahodiuk.bp.example;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.lahodiuk.bp.Edge;
 import com.lahodiuk.bp.Node;
@@ -29,17 +28,14 @@ import com.lahodiuk.bp.Potential;
 public class Coloring {
 
 	public static void main(String[] args) {
-		Potential potential = new GraphColorPotential();
+		Potential<Color, Color> potential = new GraphColorPotential();
 
 		Map<Integer, GraphColorNode> nodeIdToNode = new HashMap<Integer, GraphColorNode>();
-		for (int i = 1; i <= 10; i++) {
-			nodeIdToNode.put(i, new GraphColorNode());
-		}
 		// Make 1 node: Green
 		nodeIdToNode.put(1, new GraphColorNode() {
 			@Override
-			public double getPriorProbablility(String state) {
-				if (state == GREEN) {
+			public double getPriorProbablility(Color state) {
+				if (state == Color.GREEN) {
 					return 0.99;
 				}
 				return 0.005;
@@ -48,90 +44,87 @@ public class Coloring {
 		// Make 2 node: Red
 		nodeIdToNode.put(2, new GraphColorNode() {
 			@Override
-			public double getPriorProbablility(String state) {
-				if (state == RED) {
+			public double getPriorProbablility(Color state) {
+				if (state == Color.RED) {
 					return 0.99;
 				}
 				return 0.005;
 			}
 		});
+		for (int i = 3; i <= 10; i++) {
+			nodeIdToNode.put(i, new GraphColorNode());
+		}
 
-		List<Edge> edges = new ArrayList<>();
+		List<Edge<Color, Color>> edges = new ArrayList<>();
 
-		edges.add(Edge.connect(nodeIdToNode.get(1), nodeIdToNode.get(3), null, potential));
-		edges.add(Edge.connect(nodeIdToNode.get(1), nodeIdToNode.get(4), null, potential));
-		edges.add(Edge.connect(nodeIdToNode.get(1), nodeIdToNode.get(10), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(1), nodeIdToNode.get(3), potential));
+		edges.add(Edge.connect(nodeIdToNode.get(1), nodeIdToNode.get(4), potential));
+		edges.add(Edge.connect(nodeIdToNode.get(1), nodeIdToNode.get(10), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(2), nodeIdToNode.get(5), null, potential));
-		edges.add(Edge.connect(nodeIdToNode.get(2), nodeIdToNode.get(4), null, potential));
-		edges.add(Edge.connect(nodeIdToNode.get(2), nodeIdToNode.get(9), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(2), nodeIdToNode.get(5), potential));
+		edges.add(Edge.connect(nodeIdToNode.get(2), nodeIdToNode.get(4), potential));
+		edges.add(Edge.connect(nodeIdToNode.get(2), nodeIdToNode.get(9), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(3), nodeIdToNode.get(5), null, potential));
-		edges.add(Edge.connect(nodeIdToNode.get(3), nodeIdToNode.get(8), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(3), nodeIdToNode.get(5), potential));
+		edges.add(Edge.connect(nodeIdToNode.get(3), nodeIdToNode.get(8), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(4), nodeIdToNode.get(7), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(4), nodeIdToNode.get(7), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(5), nodeIdToNode.get(6), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(5), nodeIdToNode.get(6), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(6), nodeIdToNode.get(10), null, potential));
-		edges.add(Edge.connect(nodeIdToNode.get(6), nodeIdToNode.get(7), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(6), nodeIdToNode.get(10), potential));
+		edges.add(Edge.connect(nodeIdToNode.get(6), nodeIdToNode.get(7), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(7), nodeIdToNode.get(8), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(7), nodeIdToNode.get(8), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(8), nodeIdToNode.get(9), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(8), nodeIdToNode.get(9), potential));
 
-		edges.add(Edge.connect(nodeIdToNode.get(9), nodeIdToNode.get(10), null, potential));
+		edges.add(Edge.connect(nodeIdToNode.get(9), nodeIdToNode.get(10), potential));
 
 		for (int i = 0; i < 10; i++) {
-			for (Edge e : edges) {
+			for (Edge<Color, Color> e : edges) {
 				e.updateMessages();
 			}
-			for (Edge e : edges) {
+			for (Edge<Color, Color> e : edges) {
 				e.refreshMessages();
 			}
 		}
 
 		for (int i = 1; i <= 10; i++) {
 			System.out.print(i);
-			Map<String, Double> stateProbability = nodeIdToNode.get(i).getPosteriorProbabilities();
-			for (String state : stateProbability.keySet()) {
+			Map<Color, Double> stateProbability = nodeIdToNode.get(i).getPosteriorProbabilities();
+			for (Color state : stateProbability.keySet()) {
 				System.out.print(String.format("\t %s = %.2f", state, stateProbability.get(state)));
 			}
 			System.out.println();
 		}
 	}
 
-	private static class GraphColorNode extends Node {
+	public enum Color {
+		RED, GREEN, BLUE
+	}
 
-		public static final String RED = "red";
-		public static final String GREEN = "green";
-		public static final String BLUE = "blue";
+	public static class GraphColorNode extends Node<Color> {
 
-		private static final Set<String> COLORS = new HashSet<>();
-
-		static {
-			COLORS.add(RED);
-			COLORS.add(GREEN);
-			COLORS.add(BLUE);
-		}
+		private static final List<Color> COLORS = Arrays.asList(Color.values());
 
 		@Override
-		public Set<String> getStates() {
+		public Iterable<Color> getStates() {
 			return COLORS;
 		}
 
 		@Override
-		public double getPriorProbablility(String state) {
+		public double getPriorProbablility(Color state) {
 			return 1.0 / COLORS.size();
 		}
 	}
 
-	private static class GraphColorPotential extends Potential {
+	public static class GraphColorPotential extends Potential<Color, Color> {
 
 		private static double EPSILON = 0.000001;
 
 		@Override
-		public double getValue(String node1State, String node2State, String edgeType) {
+		public double getValue(Color node1State, Color node2State) {
 			if (node1State == node2State) {
 				return EPSILON;
 			} else {

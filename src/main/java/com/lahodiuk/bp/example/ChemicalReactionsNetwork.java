@@ -71,7 +71,7 @@ public class ChemicalReactionsNetwork {
 
 		private Map<String, CompoundNode> compoundToCompoundNode = new TreeMap<>();
 
-		private List<Edge> edges = new ArrayList<>();
+		private List<Edge<String, String>> edges = new ArrayList<>();
 
 		public ReactionsNetwork addReaction(Reaction reaction) {
 			this.reactionToReactionNode.put(reaction, new ReactionNode());
@@ -97,7 +97,9 @@ public class ChemicalReactionsNetwork {
 		}
 
 		private void buildNetwork() {
-			Potential potential = new CompatibilityPotentials();
+			Potential<String, String> reagentReactionPotential = new ReagentReactionCompatibilityPotential();
+			Potential<String, String> productReactionPotential = new ProductReactionCompatibilityPotential();
+			Potential<String, String> differentCompoundsPotential = new DifferentCompoundsCompatibilityPotential();
 
 			for (Reaction reaction : this.reactionToReactionNode.keySet()) {
 				ReactionNode reactionNode = this.reactionToReactionNode.get(reaction);
@@ -107,12 +109,12 @@ public class ChemicalReactionsNetwork {
 
 				for (String reagent : reagents) {
 					CompoundNode reagentNode = this.compoundToCompoundNode.get(reagent);
-					this.edges.add(Edge.connect(reagentNode, reactionNode, CompatibilityPotentials.REAGENT, potential));
+					this.edges.add(Edge.connect(reagentNode, reactionNode, reagentReactionPotential));
 				}
 
 				for (String product : products) {
 					CompoundNode productNode = this.compoundToCompoundNode.get(product);
-					this.edges.add(Edge.connect(productNode, reactionNode, CompatibilityPotentials.PRODUCT, potential));
+					this.edges.add(Edge.connect(productNode, reactionNode, productReactionPotential));
 				}
 
 				for (String reagent1 : new ArrayList<>(reagents)) {
@@ -124,7 +126,7 @@ public class ChemicalReactionsNetwork {
 						CompoundNode reagentNode1 = this.compoundToCompoundNode.get(reagent1);
 						CompoundNode reagentNode2 = this.compoundToCompoundNode.get(reagent2);
 
-						this.edges.add(Edge.connect(reagentNode1, reagentNode2, CompatibilityPotentials.DIFFERENT_COMPOUNDS, potential));
+						this.edges.add(Edge.connect(reagentNode1, reagentNode2, differentCompoundsPotential));
 					}
 				}
 
@@ -137,7 +139,7 @@ public class ChemicalReactionsNetwork {
 						CompoundNode productNode1 = this.compoundToCompoundNode.get(product1);
 						CompoundNode productNode2 = this.compoundToCompoundNode.get(product2);
 
-						this.edges.add(Edge.connect(productNode1, productNode2, CompatibilityPotentials.DIFFERENT_COMPOUNDS, potential));
+						this.edges.add(Edge.connect(productNode1, productNode2, differentCompoundsPotential));
 					}
 				}
 			}
@@ -147,16 +149,16 @@ public class ChemicalReactionsNetwork {
 			this.buildNetwork();
 
 			for (int i = 0; i < times; i++) {
-				for (Edge edge : this.edges) {
+				for (Edge<String, String> edge : this.edges) {
 					edge.updateMessagesNode1ToNode2();
 				}
-				for (Edge edge : this.edges) {
+				for (Edge<String, String> edge : this.edges) {
 					edge.refreshMessagesNode1ToNode2();
 				}
-				for (Edge edge : this.edges) {
+				for (Edge<String, String> edge : this.edges) {
 					edge.updateMessagesNode2ToNode1();
 				}
-				for (Edge edge : this.edges) {
+				for (Edge<String, String> edge : this.edges) {
 					edge.refreshMessagesNode2ToNode1();
 				}
 			}
@@ -172,7 +174,7 @@ public class ChemicalReactionsNetwork {
 		}
 	}
 
-	private static class CompoundNode extends Node {
+	private static class CompoundNode extends Node<String> {
 
 		public static final String WATER = "Water";
 		public static final String BASIC_OXIDE = "Basic Oxide";
@@ -222,7 +224,7 @@ public class ChemicalReactionsNetwork {
 		}
 	}
 
-	private static class ReactionNode extends Node {
+	private static class ReactionNode extends Node<String> {
 
 		public static final String BASIC_OXIDE_AND_WATER = "Basic Oxide + Water = Base";
 		public static final String ACIDIC_OXIDE_AND_WATER = "Acidic Oxide + Water = Acid";
@@ -279,13 +281,13 @@ public class ChemicalReactionsNetwork {
 		public void getMostProbableStatesByReagentsAndProductsCount() {
 			int reagentsCount = 0;
 			int productsCount = 0;
-			for (Edge edge : this.getEdges()) {
-				if (edge.getEdgeType() == CompatibilityPotentials.REAGENT) {
+			for (Edge<?, ?> edge : this.getEdges()) {
+				if (edge.getPotential() instanceof ReagentReactionCompatibilityPotential) {
 					reagentsCount++;
 					continue;
 				}
 
-				if (edge.getEdgeType() == CompatibilityPotentials.PRODUCT) {
+				if (edge.getPotential() instanceof ProductReactionCompatibilityPotential) {
 					productsCount++;
 					continue;
 				}
@@ -308,41 +310,12 @@ public class ChemicalReactionsNetwork {
 		}
 	}
 
-	private static class CompatibilityPotentials extends Potential {
-
-		private static final String REAGENT = "Reagent";
-
-		private static final String PRODUCT = "Product";
-
-		private static final String DIFFERENT_COMPOUNDS = "Different Compounds";
+	private static class ReagentReactionCompatibilityPotential extends Potential<String, String> {
 
 		private static final double EPSILON = 1e-5;
 
 		@Override
-		public double getValue(String node1State, String node2State, String edgeType) {
-			if (edgeType == DIFFERENT_COMPOUNDS) {
-				return this.differentCompoundsPotential(node1State, node2State);
-			}
-
-			if (edgeType == REAGENT) {
-				return this.reagentPotential(node1State, node2State);
-			}
-
-			if (edgeType == PRODUCT) {
-				return this.productPotential(node1State, node2State);
-			}
-
-			throw new RuntimeException();
-		}
-
-		private double differentCompoundsPotential(String compound1State, String compound2State) {
-			if (compound1State != compound2State) {
-				return 1.0 - EPSILON;
-			}
-			return EPSILON;
-		}
-
-		private double reagentPotential(String compoundState, String reactionState) {
+		public double getValue(String compoundState, String reactionState) {
 			if (reactionState == ReactionNode.BASIC_OXIDE_AND_WATER) {
 				if ((compoundState == CompoundNode.BASIC_OXIDE) || (compoundState == CompoundNode.WATER)) {
 					return 1.0 - EPSILON;
@@ -387,8 +360,14 @@ public class ChemicalReactionsNetwork {
 
 			throw new RuntimeException();
 		}
+	}
 
-		private double productPotential(String compoundState, String reactionState) {
+	private static class ProductReactionCompatibilityPotential extends Potential<String, String> {
+
+		private static final double EPSILON = 1e-5;
+
+		@Override
+		public double getValue(String compoundState, String reactionState) {
 			if (reactionState == ReactionNode.BASIC_OXIDE_AND_WATER) {
 				if (compoundState == CompoundNode.BASE) {
 					return 1.0 - EPSILON;
@@ -432,6 +411,19 @@ public class ChemicalReactionsNetwork {
 			}
 
 			throw new RuntimeException();
+		}
+	}
+
+	private static class DifferentCompoundsCompatibilityPotential extends Potential<String, String> {
+
+		private static final double EPSILON = 1e-5;
+
+		@Override
+		public double getValue(String compound1State, String compound2State) {
+			if (compound1State != compound2State) {
+				return 1.0 - EPSILON;
+			}
+			return EPSILON;
 		}
 	}
 }
