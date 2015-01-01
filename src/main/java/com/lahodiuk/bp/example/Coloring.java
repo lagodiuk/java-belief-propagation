@@ -11,7 +11,7 @@ import com.lahodiuk.bp.Node;
 import com.lahodiuk.bp.Potential;
 
 /**
- * Petersen graph <br/>
+ * Coloring of Petersen graph <br/>
  * <br/>
  * 1: [3, 4, 10], <br/>
  * 2: [5, 4, 9], <br/>
@@ -87,7 +87,9 @@ public class Coloring {
 	}
 
 	public static Map<Integer, GraphColorNode> initializeNodesOfPetersenGraph() {
+
 		Map<Integer, GraphColorNode> nodeIdToNode = new HashMap<Integer, GraphColorNode>();
+
 		// Make 1 node: Green
 		nodeIdToNode.put(1, new GraphColorNode() {
 			@Override
@@ -98,6 +100,7 @@ public class Coloring {
 				return 0.005;
 			}
 		});
+
 		// Make 2 node: Red
 		nodeIdToNode.put(2, new GraphColorNode() {
 			@Override
@@ -108,14 +111,18 @@ public class Coloring {
 				return 0.005;
 			}
 		});
+
 		for (int i = 3; i <= 10; i++) {
 			nodeIdToNode.put(i, new GraphColorNode());
 		}
+
 		return nodeIdToNode;
 	}
 
 	public enum Color {
-		RED, GREEN, BLUE
+		RED,
+		GREEN,
+		BLUE
 	}
 
 	public static class GraphColorNode extends Node<Color> {
@@ -133,9 +140,9 @@ public class Coloring {
 		}
 	}
 
-	public static class GraphColorPotential extends Potential<Color, Color> {
+	private static final double EPSILON = 0.000001;
 
-		private static double EPSILON = 0.000001;
+	public static class GraphColorPotential extends Potential<Color, Color> {
 
 		@Override
 		public double getValue(Color node1State, Color node2State) {
