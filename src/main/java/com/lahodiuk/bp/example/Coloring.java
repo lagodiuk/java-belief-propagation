@@ -28,32 +28,35 @@ import com.lahodiuk.bp.Potential;
 public class Coloring {
 
 	public static void main(String[] args) {
-		Potential<Color, Color> potential = new GraphColorPotential();
+		Map<Integer, GraphColorNode> nodeIdToNode = initializeNodesOfPetersenGraph();
 
-		Map<Integer, GraphColorNode> nodeIdToNode = new HashMap<Integer, GraphColorNode>();
-		// Make 1 node: Green
-		nodeIdToNode.put(1, new GraphColorNode() {
-			@Override
-			public double getPriorProbablility(Color state) {
-				if (state == Color.GREEN) {
-					return 0.99;
-				}
-				return 0.005;
+		List<Edge<Color, Color>> edges = initializeEdgesOfPetersenGraph(nodeIdToNode);
+
+		inferenceOfMostProbableColorsOfNodes(edges);
+
+		for (int i = 1; i <= 10; i++) {
+			System.out.print(i);
+			Map<Color, Double> stateProbability = nodeIdToNode.get(i).getPosteriorProbabilities();
+			for (Color state : stateProbability.keySet()) {
+				System.out.print(String.format("\t %s = %.2f", state, stateProbability.get(state)));
 			}
-		});
-		// Make 2 node: Red
-		nodeIdToNode.put(2, new GraphColorNode() {
-			@Override
-			public double getPriorProbablility(Color state) {
-				if (state == Color.RED) {
-					return 0.99;
-				}
-				return 0.005;
-			}
-		});
-		for (int i = 3; i <= 10; i++) {
-			nodeIdToNode.put(i, new GraphColorNode());
+			System.out.println();
 		}
+	}
+
+	public static void inferenceOfMostProbableColorsOfNodes(List<Edge<Color, Color>> edges) {
+		for (int i = 0; i < 10; i++) {
+			for (Edge<Color, Color> e : edges) {
+				e.updateMessages();
+			}
+			for (Edge<Color, Color> e : edges) {
+				e.refreshMessages();
+			}
+		}
+	}
+
+	public static List<Edge<Color, Color>> initializeEdgesOfPetersenGraph(Map<Integer, GraphColorNode> nodeIdToNode) {
+		Potential<Color, Color> potential = new GraphColorPotential();
 
 		List<Edge<Color, Color>> edges = new ArrayList<>();
 
@@ -80,24 +83,35 @@ public class Coloring {
 		edges.add(Edge.connect(nodeIdToNode.get(8), nodeIdToNode.get(9), potential));
 
 		edges.add(Edge.connect(nodeIdToNode.get(9), nodeIdToNode.get(10), potential));
+		return edges;
+	}
 
-		for (int i = 0; i < 10; i++) {
-			for (Edge<Color, Color> e : edges) {
-				e.updateMessages();
+	public static Map<Integer, GraphColorNode> initializeNodesOfPetersenGraph() {
+		Map<Integer, GraphColorNode> nodeIdToNode = new HashMap<Integer, GraphColorNode>();
+		// Make 1 node: Green
+		nodeIdToNode.put(1, new GraphColorNode() {
+			@Override
+			public double getPriorProbablility(Color state) {
+				if (state == Color.GREEN) {
+					return 0.99;
+				}
+				return 0.005;
 			}
-			for (Edge<Color, Color> e : edges) {
-				e.refreshMessages();
+		});
+		// Make 2 node: Red
+		nodeIdToNode.put(2, new GraphColorNode() {
+			@Override
+			public double getPriorProbablility(Color state) {
+				if (state == Color.RED) {
+					return 0.99;
+				}
+				return 0.005;
 			}
+		});
+		for (int i = 3; i <= 10; i++) {
+			nodeIdToNode.put(i, new GraphColorNode());
 		}
-
-		for (int i = 1; i <= 10; i++) {
-			System.out.print(i);
-			Map<Color, Double> stateProbability = nodeIdToNode.get(i).getPosteriorProbabilities();
-			for (Color state : stateProbability.keySet()) {
-				System.out.print(String.format("\t %s = %.2f", state, stateProbability.get(state)));
-			}
-			System.out.println();
-		}
+		return nodeIdToNode;
 	}
 
 	public enum Color {
