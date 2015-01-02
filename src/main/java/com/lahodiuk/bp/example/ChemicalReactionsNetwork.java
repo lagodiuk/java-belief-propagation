@@ -20,25 +20,90 @@ import com.lahodiuk.bp.Potential;
 public class ChemicalReactionsNetwork {
 
 	public static void main(String[] args) {
-		ReactionsNetwork reactionsNetwork = new ReactionsNetwork()
-				.setPriorCompoundState("Na2O", CompoundNode.BASIC_OXIDE)
-				.addReaction(new Reaction().reagents("Na2O", "H2O").products("NaOH"))
-				.addReaction(new Reaction().reagents("K2O", "H2O").products("KOH"))
-				.addReaction(new Reaction().reagents("SO3", "H2O").products("H2SO4"))
-				.addReaction(new Reaction().reagents("NaOH", "H2SO4").products("Na2SO4", "H2O"))
-				.addReaction(new Reaction().reagents("KOH", "H2SO4").products("K2SO4", "H2O"))
-				.addReaction(new Reaction().reagents("CO2", "H2O").products("H2CO3"))
-				.addReaction(new Reaction().reagents("NaOH", "H2CO3").products("Na2CO3", "H2O"))
-				.addReaction(new Reaction().reagents("LiOH", "H2SO4").products("Li2SO4", "H2O"))
-				.addReaction(new Reaction().reagents("Li2O", "H2O").products("LiOH"))
-				.addReaction(new Reaction().reagents("KOH", "H2SO4").products("KHSO4", "H2O"))
-				.addReaction(new Reaction().reagents("KHSO4", "KOH").products("K2SO4", "H2O"))
-				.inference(10);
+		ReactionsNetwork reactionsNetwork = configureReactionsNetwork();
+
+		inference(reactionsNetwork);
 
 		reactionsNetwork.result();
 	}
 
-	private static class Reaction {
+	public static void inference(ReactionsNetwork reactionsNetwork) {
+		reactionsNetwork.inference(10);
+	}
+
+	public static ReactionsNetwork configureReactionsNetwork() {
+		ReactionsNetwork reactionsNetwork = new ReactionsNetwork()
+				.setRules(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.BASE),
+						new Rule().reagentTypes(CompoundType.ACIDIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.ACID),
+						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT),
+						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER),
+						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.ACID_SALT, CompoundType.WATER),
+						new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER),
+						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER),
+						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+				.setPriorCompoundState("Na2O", CompoundType.BASIC_OXIDE)
+				.addReaction(new Reaction().reagents("Na2O", "H2O").products("NaOH"))
+				.addReaction(new Reaction().reagents("K2O", "H2O").products("KOH"))
+				.addReaction(new Reaction().reagents("SO3", "H2O").products("H2SO4"))
+				.addReaction(new Reaction().reagents("NaOH", "H2SO4").products("NaHSO4", "H2O"))
+				.addReaction(new Reaction().reagents("NaOH", "NaHSO4").products("Na2SO4", "H2O"))
+				.addReaction(new Reaction().reagents("NaOH", "H2SO4").products("Na2SO4", "H2O"))
+				.addReaction(new Reaction().reagents("KOH", "H2SO4").products("K2SO4", "H2O"))
+				.addReaction(new Reaction().reagents("CO2", "H2O").products("H2CO3"))
+				.addReaction(new Reaction().reagents("NaOH", "H2CO3").products("NaHCO3", "H2O"))
+				.addReaction(new Reaction().reagents("NaOH", "NaHCO3").products("Na2CO3", "H2O"))
+				.addReaction(new Reaction().reagents("NaOH", "H2CO3").products("Na2CO3", "H2O"))
+				.addReaction(new Reaction().reagents("LiOH", "H2SO4").products("Li2SO4", "H2O"))
+				.addReaction(new Reaction().reagents("LiOH", "H2SO4").products("LiHSO4", "H2O"))
+				.addReaction(new Reaction().reagents("LiOH", "LiHSO4").products("Li2SO4", "H2O"))
+				.addReaction(new Reaction().reagents("Li2O", "H2O").products("LiOH"))
+				.addReaction(new Reaction().reagents("KOH", "H2SO4").products("KHSO4", "H2O"))
+				.addReaction(new Reaction().reagents("KHSO4", "KOH").products("K2SO4", "H2O"))
+				.addReaction(new Reaction().reagents("KOH", "H2CO3").products("K2CO3", "H2O"))
+				.addReaction(new Reaction().reagents("KOH", "H2CO3").products("KHCO3", "H2O"))
+				.addReaction(new Reaction().reagents("KOH", "KHCO3").products("K2CO3", "H2O"));
+
+		return reactionsNetwork;
+	}
+
+	public enum CompoundType {
+		WATER,
+		BASIC_OXIDE,
+		ACIDIC_OXIDE,
+		BASE,
+		ACID,
+		SALT,
+		ACID_SALT
+	}
+
+	public static class Rule {
+		private Set<CompoundType> reagentTypes = new HashSet<>();
+		private Set<CompoundType> productTypes = new HashSet<>();
+
+		public Rule reagentTypes(CompoundType... reagents) {
+			for (CompoundType r : reagents) {
+				this.reagentTypes.add(r);
+			}
+			return this;
+		}
+
+		public Rule productTypes(CompoundType... products) {
+			for (CompoundType p : products) {
+				this.productTypes.add(p);
+			}
+			return this;
+		}
+
+		public Set<CompoundType> getProductTypes() {
+			return this.productTypes;
+		}
+
+		public Set<CompoundType> getReagentTypes() {
+			return this.reagentTypes;
+		}
+	}
+
+	public static class Reaction {
 		private Set<String> reagents = new HashSet<>();
 		private Set<String> products = new HashSet<>();
 
@@ -65,16 +130,23 @@ public class ChemicalReactionsNetwork {
 		}
 	}
 
-	private static class ReactionsNetwork {
+	public static class ReactionsNetwork {
+
+		private List<Rule> rules = new ArrayList<>();
+
+		private Map<Integer, Set<Rule>> reagentsCountToRules = new HashMap<>();
+
+		private Map<Integer, Set<Rule>> productsCountToRules = new HashMap<>();
 
 		private Map<Reaction, ReactionNode> reactionToReactionNode = new HashMap<>();
 
 		private Map<String, CompoundNode> compoundToCompoundNode = new TreeMap<>();
 
-		private List<Edge<String, String>> edges = new ArrayList<>();
+		private List<Edge<?, ?>> edges = new ArrayList<>();
 
 		public ReactionsNetwork addReaction(Reaction reaction) {
-			this.reactionToReactionNode.put(reaction, new ReactionNode(reaction.getReagents().size(), reaction.getProducts().size()));
+			this.reactionToReactionNode.put(reaction, new ReactionNode(reaction.getReagents().size(), reaction.getProducts().size(), this.rules, this.reagentsCountToRules,
+					this.productsCountToRules));
 
 			for (String reagent : reaction.getReagents()) {
 				if (this.compoundToCompoundNode.get(reagent) == null) {
@@ -91,15 +163,39 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		public ReactionsNetwork setPriorCompoundState(String compound, String priorState) {
+		public ReactionsNetwork setPriorCompoundState(String compound, CompoundType priorState) {
 			this.compoundToCompoundNode.put(compound, new CompoundNode(priorState));
 			return this;
 		}
 
+		public ReactionsNetwork setRules(Rule... rules) {
+			for (Rule rule : rules) {
+				this.rules.add(rule);
+			}
+			for (Rule rule : rules) {
+				int reagentsCount = rule.getReagentTypes().size();
+				Set<Rule> rulesWithSameNumberOfReagents = this.reagentsCountToRules.get(reagentsCount);
+				if (rulesWithSameNumberOfReagents == null) {
+					rulesWithSameNumberOfReagents = new HashSet<>();
+				}
+				rulesWithSameNumberOfReagents.add(rule);
+				this.reagentsCountToRules.put(reagentsCount, rulesWithSameNumberOfReagents);
+
+				int productsCount = rule.getProductTypes().size();
+				Set<Rule> rulesWithSameNumberOfProducts = this.productsCountToRules.get(productsCount);
+				if (rulesWithSameNumberOfProducts == null) {
+					rulesWithSameNumberOfProducts = new HashSet<>();
+				}
+				rulesWithSameNumberOfProducts.add(rule);
+				this.productsCountToRules.put(productsCount, rulesWithSameNumberOfProducts);
+			}
+			return this;
+		}
+
 		private void buildNetwork() {
-			Potential<String, String> reagentReactionPotential = new ReagentReactionCompatibilityPotential();
-			Potential<String, String> productReactionPotential = new ProductReactionCompatibilityPotential();
-			Potential<String, String> differentCompoundsPotential = new DifferentCompoundsCompatibilityPotential();
+			Potential<CompoundType, Rule> reagentReactionPotential = new ReagentReactionCompatibilityPotential();
+			Potential<CompoundType, Rule> productReactionPotential = new ProductReactionCompatibilityPotential();
+			Potential<CompoundType, CompoundType> differentCompoundsPotential = new DifferentCompoundsCompatibilityPotential();
 
 			for (Reaction reaction : this.reactionToReactionNode.keySet()) {
 				ReactionNode reactionNode = this.reactionToReactionNode.get(reaction);
@@ -149,16 +245,16 @@ public class ChemicalReactionsNetwork {
 			this.buildNetwork();
 
 			for (int i = 0; i < times; i++) {
-				for (Edge<String, String> edge : this.edges) {
+				for (Edge<?, ?> edge : this.edges) {
 					edge.updateMessagesNode1ToNode2();
 				}
-				for (Edge<String, String> edge : this.edges) {
+				for (Edge<?, ?> edge : this.edges) {
 					edge.refreshMessagesNode1ToNode2();
 				}
-				for (Edge<String, String> edge : this.edges) {
+				for (Edge<?, ?> edge : this.edges) {
 					edge.updateMessagesNode2ToNode1();
 				}
-				for (Edge<String, String> edge : this.edges) {
+				for (Edge<?, ?> edge : this.edges) {
 					edge.refreshMessagesNode2ToNode1();
 				}
 			}
@@ -172,46 +268,34 @@ public class ChemicalReactionsNetwork {
 				System.out.println();
 			}
 		}
+
+		public CompoundType getMostProbableCompoundType(String compound) {
+			return this.compoundToCompoundNode.get(compound).getMostProbableState();
+		}
 	}
 
-	private static class CompoundNode extends Node<String> {
-
-		public static final String WATER = "Water";
-		public static final String BASIC_OXIDE = "Basic Oxide";
-		public static final String BASE = "Base";
-		public static final String ACIDIC_OXIDE = "Acidic oxide";
-		public static final String ACID = "Acid";
-		public static final String SALT = "Salt";
+	private static class CompoundNode extends Node<CompoundType> {
 
 		private static final double EPSILON = 1e-5;
 
-		private static final Set<String> STATES = new HashSet<>();
+		private static final List<CompoundType> STATES = Arrays.asList(CompoundType.values());
 
-		private String mostProbableState;
-
-		static {
-			STATES.add(WATER);
-			STATES.add(BASIC_OXIDE);
-			STATES.add(BASE);
-			STATES.add(ACIDIC_OXIDE);
-			STATES.add(ACID);
-			STATES.add(SALT);
-		}
+		private CompoundType mostProbableState;
 
 		public CompoundNode() {
 		}
 
-		public CompoundNode(String mostProbableState) {
+		public CompoundNode(CompoundType mostProbableState) {
 			this.mostProbableState = mostProbableState;
 		}
 
 		@Override
-		public Set<String> getStates() {
+		public Iterable<CompoundType> getStates() {
 			return STATES;
 		}
 
 		@Override
-		public double getPriorProbablility(String state) {
+		public double getPriorProbablility(CompoundType state) {
 			if (this.mostProbableState == null) {
 				return 1.0 / STATES.size();
 			} else {
@@ -224,49 +308,32 @@ public class ChemicalReactionsNetwork {
 		}
 	}
 
-	private static class ReactionNode extends Node<String> {
-
-		public static final String BASIC_OXIDE_AND_WATER = "Basic Oxide + Water = Base";
-		public static final String ACIDIC_OXIDE_AND_WATER = "Acidic Oxide + Water = Acid";
-		public static final String BASIC_OXIDE_AND_ACIDIC_OXIDE = "Basic Oxide + Acidic Oxide = Salt";
-		public static final String BASE_AND_ACID = "Base + Acid = Salt + Water";
-		public static final String BASE_AND_ACIDIC_OXIDE = "Base + Acidic Oxide = Salt + Water";
-		public static final String BASIC_OXIDE_AND_ACID = "Basic Oxide + Acid = Salt + Water";
-
-		private static final Set<String> STATES = new HashSet<>();
-
-		private static final Map<Integer, Set<String>> REAGENTS_COUNT_TO_STATES = new HashMap<>();
-		private static final Map<Integer, Set<String>> PRODUCTS_COUNT_TO_STATES = new HashMap<>();
+	private static class ReactionNode extends Node<Rule> {
 
 		private static final double EPSILON = 1e-5;
 
-		static {
-			STATES.add(BASIC_OXIDE_AND_WATER);
-			STATES.add(ACIDIC_OXIDE_AND_WATER);
-			STATES.add(BASIC_OXIDE_AND_ACIDIC_OXIDE);
-			STATES.add(BASE_AND_ACID);
-			STATES.add(BASE_AND_ACIDIC_OXIDE);
-			STATES.add(BASIC_OXIDE_AND_ACID);
+		private List<Rule> rules;
 
-			REAGENTS_COUNT_TO_STATES.put(2, STATES);
+		private Map<Integer, Set<Rule>> reagentsCountToRules;
 
-			PRODUCTS_COUNT_TO_STATES.put(1, new HashSet<>(Arrays.asList(BASIC_OXIDE_AND_WATER, ACIDIC_OXIDE_AND_WATER, BASIC_OXIDE_AND_ACIDIC_OXIDE)));
-			PRODUCTS_COUNT_TO_STATES.put(2, new HashSet<>(Arrays.asList(BASE_AND_ACID, BASE_AND_ACIDIC_OXIDE, BASIC_OXIDE_AND_ACID)));
-		}
+		private Map<Integer, Set<Rule>> productsCountToRules;
 
-		private Set<String> mostProbableStatesByProductsAndReagentsCount = null;
+		private Set<Rule> mostProbableStatesByProductsAndReagentsCount = null;
 
-		public ReactionNode(int reagentsCount, int productsCount) {
+		public ReactionNode(int reagentsCount, int productsCount, List<Rule> rules, Map<Integer, Set<Rule>> reagentsCountToRules, Map<Integer, Set<Rule>> productsCountToRules) {
+			this.rules = rules;
+			this.reagentsCountToRules = reagentsCountToRules;
+			this.productsCountToRules = productsCountToRules;
 			this.setMostProbableStatesByReagentsAndProductsCount(reagentsCount, productsCount);
 		}
 
 		@Override
-		public Set<String> getStates() {
-			return STATES;
+		public Iterable<Rule> getStates() {
+			return this.rules;
 		}
 
 		@Override
-		public double getPriorProbablility(String state) {
+		public double getPriorProbablility(Rule state) {
 			if (this.mostProbableStatesByProductsAndReagentsCount.contains(state)) {
 				return 1.0 / this.mostProbableStatesByProductsAndReagentsCount.size();
 			} else {
@@ -275,13 +342,13 @@ public class ChemicalReactionsNetwork {
 		}
 
 		public void setMostProbableStatesByReagentsAndProductsCount(int reagentsCount, int productsCount) {
-			Set<String> mostProbableStatesByReagentsCount = REAGENTS_COUNT_TO_STATES.get(reagentsCount);
-			Set<String> mostProbableStatesByProductsCount = PRODUCTS_COUNT_TO_STATES.get(productsCount);
+			Set<Rule> mostProbableStatesByReagentsCount = this.reagentsCountToRules.get(reagentsCount);
+			Set<Rule> mostProbableStatesByProductsCount = this.productsCountToRules.get(productsCount);
 
 			this.mostProbableStatesByProductsAndReagentsCount = new HashSet<>();
 
 			if ((mostProbableStatesByProductsCount != null) && (mostProbableStatesByReagentsCount != null)) {
-				for (String s : mostProbableStatesByProductsCount) {
+				for (Rule s : mostProbableStatesByProductsCount) {
 					if (mostProbableStatesByReagentsCount.contains(s)) {
 						this.mostProbableStatesByProductsAndReagentsCount.add(s);
 					}
@@ -292,121 +359,45 @@ public class ChemicalReactionsNetwork {
 				// TODO Warn
 				System.out.println("Can't find any reactions withs given numbers of products and reagents");
 
-				this.mostProbableStatesByProductsAndReagentsCount = STATES;
+				this.mostProbableStatesByProductsAndReagentsCount = new HashSet<>(this.rules);
 			}
 		}
 	}
 
-	private static class ReagentReactionCompatibilityPotential extends Potential<String, String> {
+	private static class ReagentReactionCompatibilityPotential extends Potential<CompoundType, Rule> {
 
 		private static final double EPSILON = 1e-5;
 
 		@Override
-		public double getValue(String compoundState, String reactionState) {
-			if (reactionState == ReactionNode.BASIC_OXIDE_AND_WATER) {
-				if ((compoundState == CompoundNode.BASIC_OXIDE) || (compoundState == CompoundNode.WATER)) {
-					return 1.0 - EPSILON;
-				}
+		public double getValue(CompoundType compoundState, Rule reactionState) {
+			if (reactionState.getReagentTypes().contains(compoundState)) {
+				return 1 - EPSILON;
+			} else {
 				return EPSILON;
 			}
-
-			if (reactionState == ReactionNode.ACIDIC_OXIDE_AND_WATER) {
-				if ((compoundState == CompoundNode.ACIDIC_OXIDE) || (compoundState == CompoundNode.WATER)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASIC_OXIDE_AND_ACIDIC_OXIDE) {
-				if ((compoundState == CompoundNode.ACIDIC_OXIDE) || (compoundState == CompoundNode.BASIC_OXIDE)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASE_AND_ACID) {
-				if ((compoundState == CompoundNode.BASE) || (compoundState == CompoundNode.ACID)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASE_AND_ACIDIC_OXIDE) {
-				if ((compoundState == CompoundNode.BASE) || (compoundState == CompoundNode.ACIDIC_OXIDE)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASIC_OXIDE_AND_ACID) {
-				if ((compoundState == CompoundNode.BASIC_OXIDE) || (compoundState == CompoundNode.ACID)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			throw new RuntimeException();
 		}
 	}
 
-	private static class ProductReactionCompatibilityPotential extends Potential<String, String> {
+	private static class ProductReactionCompatibilityPotential extends Potential<CompoundType, Rule> {
 
 		private static final double EPSILON = 1e-5;
 
 		@Override
-		public double getValue(String compoundState, String reactionState) {
-			if (reactionState == ReactionNode.BASIC_OXIDE_AND_WATER) {
-				if (compoundState == CompoundNode.BASE) {
-					return 1.0 - EPSILON;
-				}
+		public double getValue(CompoundType compoundState, Rule reactionState) {
+			if (reactionState.getProductTypes().contains(compoundState)) {
+				return 1 - EPSILON;
+			} else {
 				return EPSILON;
 			}
-
-			if (reactionState == ReactionNode.ACIDIC_OXIDE_AND_WATER) {
-				if (compoundState == CompoundNode.ACID) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASIC_OXIDE_AND_ACIDIC_OXIDE) {
-				if (compoundState == CompoundNode.SALT) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASE_AND_ACID) {
-				if ((compoundState == CompoundNode.SALT) || (compoundState == CompoundNode.WATER)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASE_AND_ACIDIC_OXIDE) {
-				if ((compoundState == CompoundNode.SALT) || (compoundState == CompoundNode.WATER)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			if (reactionState == ReactionNode.BASIC_OXIDE_AND_ACID) {
-				if ((compoundState == CompoundNode.SALT) || (compoundState == CompoundNode.WATER)) {
-					return 1.0 - EPSILON;
-				}
-				return EPSILON;
-			}
-
-			throw new RuntimeException();
 		}
 	}
 
-	private static class DifferentCompoundsCompatibilityPotential extends Potential<String, String> {
+	private static class DifferentCompoundsCompatibilityPotential extends Potential<CompoundType, CompoundType> {
 
 		private static final double EPSILON = 1e-5;
 
 		@Override
-		public double getValue(String compound1State, String compound2State) {
+		public double getValue(CompoundType compound1State, CompoundType compound2State) {
 			if (compound1State != compound2State) {
 				return 1.0 - EPSILON;
 			}
