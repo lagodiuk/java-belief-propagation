@@ -41,7 +41,7 @@ public class ChemicalReactionsNetwork {
 						new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER),
 						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER),
 						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
-				.setPriorCompoundState("Na2O", CompoundType.BASIC_OXIDE)
+				// .setPriorCompoundState("Na2O", CompoundType.BASIC_OXIDE)
 				.addReaction(new Reaction().reagents("Na2O", "H2O").products("NaOH"))
 				.addReaction(new Reaction().reagents("K2O", "H2O").products("KOH"))
 				.addReaction(new Reaction().reagents("SO3", "H2O").products("H2SO4"))
