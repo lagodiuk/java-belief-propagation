@@ -41,6 +41,9 @@ public class ChemicalReactionsNetwork {
 						new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER),
 						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER),
 						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+				// Interesting: it is possible to infer chemical compound types,
+				// even without prior knowledge about any of chemical compounds
+				// (without "seed")
 				// .setPriorCompoundState("Na2O", CompoundType.BASIC_OXIDE)
 				.addReaction(new Reaction().reagents("Na2O", "H2O").products("NaOH"))
 				.addReaction(new Reaction().reagents("K2O", "H2O").products("KOH"))
@@ -61,7 +64,10 @@ public class ChemicalReactionsNetwork {
 				.addReaction(new Reaction().reagents("KHSO4", "KOH").products("K2SO4", "H2O"))
 				.addReaction(new Reaction().reagents("KOH", "H2CO3").products("K2CO3", "H2O"))
 				.addReaction(new Reaction().reagents("KOH", "H2CO3").products("KHCO3", "H2O"))
-				.addReaction(new Reaction().reagents("KOH", "KHCO3").products("K2CO3", "H2O"));
+				.addReaction(new Reaction().reagents("KOH", "KHCO3").products("K2CO3", "H2O"))
+				.addReaction(new Reaction().reagents("LiOH", "H2CO3").products("LiHCO3", "H2O"))
+				.addReaction(new Reaction().reagents("LiOH", "LiHCO3").products("Li2CO3", "H2O"))
+				.addReaction(new Reaction().reagents("Li2O", "CO2").products("Li2CO3"));
 
 		return reactionsNetwork;
 	}

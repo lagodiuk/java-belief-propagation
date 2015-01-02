@@ -37,6 +37,7 @@ public class ChemicalReactionsNetworkTest {
 		assertEquals(CompoundType.ACID, this.reactionsNetwork.getMostProbableCompoundType("H2CO3"));
 		assertEquals(CompoundType.ACID, this.reactionsNetwork.getMostProbableCompoundType("H2SO4"));
 
+		assertEquals(CompoundType.SALT, this.reactionsNetwork.getMostProbableCompoundType("Li2CO3"));
 		assertEquals(CompoundType.SALT, this.reactionsNetwork.getMostProbableCompoundType("Li2SO4"));
 		assertEquals(CompoundType.SALT, this.reactionsNetwork.getMostProbableCompoundType("Na2SO4"));
 		assertEquals(CompoundType.SALT, this.reactionsNetwork.getMostProbableCompoundType("Na2CO3"));
@@ -44,6 +45,7 @@ public class ChemicalReactionsNetworkTest {
 		assertEquals(CompoundType.SALT, this.reactionsNetwork.getMostProbableCompoundType("K2CO3"));
 
 		assertEquals(CompoundType.ACID_SALT, this.reactionsNetwork.getMostProbableCompoundType("LiHSO4"));
+		assertEquals(CompoundType.ACID_SALT, this.reactionsNetwork.getMostProbableCompoundType("LiHCO3"));
 		assertEquals(CompoundType.ACID_SALT, this.reactionsNetwork.getMostProbableCompoundType("NaHSO4"));
 		assertEquals(CompoundType.ACID_SALT, this.reactionsNetwork.getMostProbableCompoundType("NaHCO3"));
 		assertEquals(CompoundType.ACID_SALT, this.reactionsNetwork.getMostProbableCompoundType("KHSO4"));
