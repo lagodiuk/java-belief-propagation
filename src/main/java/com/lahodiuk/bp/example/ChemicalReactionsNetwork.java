@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +41,8 @@ public class ChemicalReactionsNetwork {
 						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.ACID_SALT, CompoundType.WATER),
 						new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER),
 						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER),
-						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER),
+						new Rule().reagentTypes(CompoundType.SALT, CompoundType.SALT).productTypes(CompoundType.SALT, CompoundType.SALT))
 				// Interesting: it is possible to infer chemical compound types,
 				// even without prior knowledge about any of chemical compounds
 				// (without "seed")
@@ -67,7 +69,11 @@ public class ChemicalReactionsNetwork {
 				.addReaction(new Reaction().reagents("KOH", "KHCO3").products("K2CO3", "H2O"))
 				.addReaction(new Reaction().reagents("LiOH", "H2CO3").products("LiHCO3", "H2O"))
 				.addReaction(new Reaction().reagents("LiOH", "LiHCO3").products("Li2CO3", "H2O"))
-				.addReaction(new Reaction().reagents("Li2O", "CO2").products("Li2CO3"));
+				.addReaction(new Reaction().reagents("Li2O", "CO2").products("Li2CO3"))
+
+				.addReaction(new Reaction().reagents("Al2O3", "H2O").products("Al(OH)3"))
+				.addReaction(new Reaction().reagents("Al(OH)3", "H2CO3").products("Al2(CO3)3", "H2O"))
+				.addReaction(new Reaction().reagents("Al(OH)3", "KOH").products("KAlO2", "H2O"));
 
 		return reactionsNetwork;
 	}
@@ -83,8 +89,8 @@ public class ChemicalReactionsNetwork {
 	}
 
 	public static class Rule {
-		private Set<CompoundType> reagentTypes = new HashSet<>();
-		private Set<CompoundType> productTypes = new HashSet<>();
+		private List<CompoundType> reagentTypes = new ArrayList<>();
+		private List<CompoundType> productTypes = new ArrayList<>();
 
 		public Rule reagentTypes(CompoundType... reagents) {
 			for (CompoundType r : reagents) {
@@ -100,18 +106,32 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		public Set<CompoundType> getProductTypes() {
+		public Rule reagentTypes(List<CompoundType> reagents) {
+			for (CompoundType r : reagents) {
+				this.reagentTypes.add(r);
+			}
+			return this;
+		}
+
+		public Rule productTypes(List<CompoundType> products) {
+			for (CompoundType p : products) {
+				this.productTypes.add(p);
+			}
+			return this;
+		}
+
+		public List<CompoundType> getProductTypes() {
 			return this.productTypes;
 		}
 
-		public Set<CompoundType> getReagentTypes() {
+		public List<CompoundType> getReagentTypes() {
 			return this.reagentTypes;
 		}
 	}
 
 	public static class Reaction {
-		private Set<String> reagents = new HashSet<>();
-		private Set<String> products = new HashSet<>();
+		private List<String> reagents = new ArrayList<>();
+		private List<String> products = new ArrayList<>();
 
 		public Reaction reagents(String... reagents) {
 			for (String r : reagents) {
@@ -127,11 +147,11 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		public Set<String> getProducts() {
+		public List<String> getProducts() {
 			return this.products;
 		}
 
-		public Set<String> getReagents() {
+		public List<String> getReagents() {
 			return this.reagents;
 		}
 	}
@@ -151,7 +171,7 @@ public class ChemicalReactionsNetwork {
 		private List<Edge<?, ?>> edges = new ArrayList<>();
 
 		public ReactionsNetwork addReaction(Reaction reaction) {
-			this.reactionToReactionNode.put(reaction, new ReactionNode(reaction.getReagents().size(), reaction.getProducts().size(), this.rules, this.reagentsCountToRules,
+			this.reactionToReactionNode.put(reaction, new ReactionNode(reaction.getReagents().size(), reaction.getProducts().size(), this.reagentsCountToRules,
 					this.productsCountToRules));
 
 			for (String reagent : reaction.getReagents()) {
@@ -176,9 +196,20 @@ public class ChemicalReactionsNetwork {
 
 		public ReactionsNetwork setRules(Rule... rules) {
 			for (Rule rule : rules) {
-				this.rules.add(rule);
+				List<List<CompoundType>> reagentsPermutations = permutations(rule.getReagentTypes());
+				List<List<CompoundType>> productsPermutations = permutations(rule.getProductTypes());
+
+				// TODO Refactoring
+				for (List<CompoundType> re : reagentsPermutations) {
+					for (List<CompoundType> pr : productsPermutations) {
+						this.rules.add(new Rule().reagentTypes(re).productTypes(pr));
+					}
+				}
 			}
-			for (Rule rule : rules) {
+
+			// System.out.println(this.rules.size());
+
+			for (Rule rule : this.rules) {
 				int reagentsCount = rule.getReagentTypes().size();
 				Set<Rule> rulesWithSameNumberOfReagents = this.reagentsCountToRules.get(reagentsCount);
 				if (rulesWithSameNumberOfReagents == null) {
@@ -198,51 +229,48 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		private void buildNetwork() {
-			Potential<CompoundType, Rule> reagentReactionPotential = new ReagentReactionCompatibilityPotential();
-			Potential<CompoundType, Rule> productReactionPotential = new ProductReactionCompatibilityPotential();
-			Potential<CompoundType, CompoundType> differentCompoundsPotential = new DifferentCompoundsCompatibilityPotential();
+		// TODO Refactoring
+		private static <T> List<List<T>> permutations(List<T> seq) {
+			if (seq.size() == 1) {
+				return Arrays.asList(seq);
+			}
+			List<List<T>> perm = permutations(seq.subList(1, seq.size()));
 
+			List<List<T>> result = new ArrayList<>();
+			for (List<T> p : perm) {
+				for (int i = 0; i < p.size(); i++) {
+					List<T> r = new LinkedList<>();
+					r.addAll(p.subList(0, i));
+					r.add(seq.get(0));
+					r.addAll(p.subList(i, p.size()));
+					result.add(r);
+				}
+				List<T> r = new LinkedList<>();
+				r.addAll(p);
+				r.add(seq.get(0));
+				result.add(r);
+			}
+			return result;
+		}
+
+		private void buildNetwork() {
 			for (Reaction reaction : this.reactionToReactionNode.keySet()) {
 				ReactionNode reactionNode = this.reactionToReactionNode.get(reaction);
 
-				Set<String> reagents = reaction.getReagents();
-				Set<String> products = reaction.getProducts();
+				List<String> reagents = reaction.getReagents();
 
-				for (String reagent : reagents) {
+				for (int position = 0; position < reagents.size(); position++) {
+					String reagent = reagents.get(position);
 					CompoundNode reagentNode = this.compoundToCompoundNode.get(reagent);
-					this.edges.add(Edge.connect(reagentNode, reactionNode, reagentReactionPotential));
+					this.edges.add(Edge.connect(reagentNode, reactionNode, new ReagentReactionCompatibilityPotential(position)));
 				}
 
-				for (String product : products) {
+				List<String> products = reaction.getProducts();
+
+				for (int position = 0; position < products.size(); position++) {
+					String product = products.get(position);
 					CompoundNode productNode = this.compoundToCompoundNode.get(product);
-					this.edges.add(Edge.connect(productNode, reactionNode, productReactionPotential));
-				}
-
-				for (String reagent1 : new ArrayList<>(reagents)) {
-					for (String reagent2 : new ArrayList<>(reagents)) {
-						if (reagent1 == reagent2) {
-							continue;
-						}
-
-						CompoundNode reagentNode1 = this.compoundToCompoundNode.get(reagent1);
-						CompoundNode reagentNode2 = this.compoundToCompoundNode.get(reagent2);
-
-						this.edges.add(Edge.connect(reagentNode1, reagentNode2, differentCompoundsPotential));
-					}
-				}
-
-				for (String product1 : new ArrayList<>(products)) {
-					for (String product2 : new ArrayList<>(products)) {
-						if (product1 == product2) {
-							continue;
-						}
-
-						CompoundNode productNode1 = this.compoundToCompoundNode.get(product1);
-						CompoundNode productNode2 = this.compoundToCompoundNode.get(product2);
-
-						this.edges.add(Edge.connect(productNode1, productNode2, differentCompoundsPotential));
-					}
+					this.edges.add(Edge.connect(productNode, reactionNode, new ProductReactionCompatibilityPotential(position)));
 				}
 			}
 		}
@@ -318,16 +346,13 @@ public class ChemicalReactionsNetwork {
 
 		private static final double EPSILON = 1e-5;
 
-		private List<Rule> rules;
-
 		private Map<Integer, Set<Rule>> reagentsCountToRules;
 
 		private Map<Integer, Set<Rule>> productsCountToRules;
 
 		private Set<Rule> mostProbableStatesByProductsAndReagentsCount = null;
 
-		public ReactionNode(int reagentsCount, int productsCount, List<Rule> rules, Map<Integer, Set<Rule>> reagentsCountToRules, Map<Integer, Set<Rule>> productsCountToRules) {
-			this.rules = rules;
+		public ReactionNode(int reagentsCount, int productsCount, Map<Integer, Set<Rule>> reagentsCountToRules, Map<Integer, Set<Rule>> productsCountToRules) {
 			this.reagentsCountToRules = reagentsCountToRules;
 			this.productsCountToRules = productsCountToRules;
 			this.setMostProbableStatesByReagentsAndProductsCount(reagentsCount, productsCount);
@@ -335,7 +360,7 @@ public class ChemicalReactionsNetwork {
 
 		@Override
 		public Iterable<Rule> getStates() {
-			return this.rules;
+			return this.mostProbableStatesByProductsAndReagentsCount;
 		}
 
 		@Override
@@ -362,10 +387,7 @@ public class ChemicalReactionsNetwork {
 			}
 
 			if (this.mostProbableStatesByProductsAndReagentsCount.isEmpty()) {
-				// TODO Warn
-				System.out.println("Can't find any reactions withs given numbers of products and reagents");
-
-				this.mostProbableStatesByProductsAndReagentsCount = new HashSet<>(this.rules);
+				throw new RuntimeException("Can't find any reactions withs given numbers of products and reagents");
 			}
 		}
 	}
@@ -374,9 +396,15 @@ public class ChemicalReactionsNetwork {
 
 		private static final double EPSILON = 1e-5;
 
+		private final int position;
+
+		public ReagentReactionCompatibilityPotential(int position) {
+			this.position = position;
+		}
+
 		@Override
 		public double getValue(CompoundType compoundState, Rule reactionState) {
-			if (reactionState.getReagentTypes().contains(compoundState)) {
+			if (reactionState.getReagentTypes().get(this.position) == compoundState) {
 				return 1 - EPSILON;
 			} else {
 				return EPSILON;
@@ -388,26 +416,19 @@ public class ChemicalReactionsNetwork {
 
 		private static final double EPSILON = 1e-5;
 
+		private final int position;
+
+		public ProductReactionCompatibilityPotential(int position) {
+			this.position = position;
+		}
+
 		@Override
 		public double getValue(CompoundType compoundState, Rule reactionState) {
-			if (reactionState.getProductTypes().contains(compoundState)) {
+			if (reactionState.getProductTypes().get(this.position) == compoundState) {
 				return 1 - EPSILON;
 			} else {
 				return EPSILON;
 			}
-		}
-	}
-
-	private static class DifferentCompoundsCompatibilityPotential extends Potential<CompoundType, CompoundType> {
-
-		private static final double EPSILON = 1e-5;
-
-		@Override
-		public double getValue(CompoundType compound1State, CompoundType compound2State) {
-			if (compound1State != compound2State) {
-				return 1.0 - EPSILON;
-			}
-			return EPSILON;
 		}
 	}
 }
