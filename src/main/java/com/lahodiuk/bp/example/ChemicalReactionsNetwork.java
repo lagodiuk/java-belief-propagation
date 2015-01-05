@@ -25,7 +25,7 @@ public class ChemicalReactionsNetwork {
 
 		inference(reactionsNetwork);
 
-		reactionsNetwork.result();
+		reactionsNetwork.printResults();
 	}
 
 	public static void inference(ReactionsNetwork reactionsNetwork) {
@@ -34,15 +34,15 @@ public class ChemicalReactionsNetwork {
 
 	public static ReactionsNetwork configureReactionsNetwork() {
 		ReactionsNetwork reactionsNetwork = new ReactionsNetwork()
-				.setRules(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.BASE),
-						new Rule().reagentTypes(CompoundType.ACIDIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.ACID),
-						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT),
-						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER),
-						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.ACID_SALT, CompoundType.WATER),
-						new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER),
-						new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER),
-						new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER),
-						new Rule().reagentTypes(CompoundType.SALT, CompoundType.SALT).productTypes(CompoundType.SALT, CompoundType.SALT))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.BASE))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.ACIDIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.ACID))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.ACID_SALT, CompoundType.WATER))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.SALT, CompoundType.SALT).productTypes(CompoundType.SALT, CompoundType.SALT))
 				// Interesting: it is possible to infer chemical compound types,
 				// even without prior knowledge about any of chemical compounds
 				// (without "seed")
@@ -160,6 +160,8 @@ public class ChemicalReactionsNetwork {
 
 		private List<Rule> rules = new ArrayList<>();
 
+		private List<Reaction> reactions = new ArrayList<>();
+
 		private Map<Integer, Set<Rule>> reagentsCountToRules = new HashMap<>();
 
 		private Map<Integer, Set<Rule>> productsCountToRules = new HashMap<>();
@@ -170,22 +172,27 @@ public class ChemicalReactionsNetwork {
 
 		private List<Edge<?, ?>> edges = new ArrayList<>();
 
+		public ReactionsNetwork addRule(Rule ruleVariant) {
+			this.rules.add(ruleVariant);
+			return this;
+		}
+
+		public ReactionsNetwork addRuleWithAllowedPermutations(Rule rule) {
+			List<List<CompoundType>> reagentsPermutations = permutations(rule.getReagentTypes());
+			List<List<CompoundType>> productsPermutations = permutations(rule.getProductTypes());
+
+			for (List<CompoundType> reagents : reagentsPermutations) {
+				for (List<CompoundType> products : productsPermutations) {
+					Rule ruleVariant = new Rule().reagentTypes(reagents).productTypes(products);
+					this.addRule(ruleVariant);
+				}
+			}
+
+			return this;
+		}
+
 		public ReactionsNetwork addReaction(Reaction reaction) {
-			this.reactionToReactionNode.put(reaction, new ReactionNode(reaction.getReagents().size(), reaction.getProducts().size(), this.reagentsCountToRules,
-					this.productsCountToRules));
-
-			for (String reagent : reaction.getReagents()) {
-				if (this.compoundToCompoundNode.get(reagent) == null) {
-					this.compoundToCompoundNode.put(reagent, new CompoundNode());
-				}
-			}
-
-			for (String product : reaction.getProducts()) {
-				if (this.compoundToCompoundNode.get(product) == null) {
-					this.compoundToCompoundNode.put(product, new CompoundNode());
-				}
-			}
-
+			this.reactions.add(reaction);
 			return this;
 		}
 
@@ -194,42 +201,7 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		public ReactionsNetwork setRules(Rule... rules) {
-			for (Rule rule : rules) {
-				List<List<CompoundType>> reagentsPermutations = permutations(rule.getReagentTypes());
-				List<List<CompoundType>> productsPermutations = permutations(rule.getProductTypes());
-
-				// TODO Refactoring
-				for (List<CompoundType> re : reagentsPermutations) {
-					for (List<CompoundType> pr : productsPermutations) {
-						this.rules.add(new Rule().reagentTypes(re).productTypes(pr));
-					}
-				}
-			}
-
-			// System.out.println(this.rules.size());
-
-			for (Rule rule : this.rules) {
-				int reagentsCount = rule.getReagentTypes().size();
-				Set<Rule> rulesWithSameNumberOfReagents = this.reagentsCountToRules.get(reagentsCount);
-				if (rulesWithSameNumberOfReagents == null) {
-					rulesWithSameNumberOfReagents = new HashSet<>();
-				}
-				rulesWithSameNumberOfReagents.add(rule);
-				this.reagentsCountToRules.put(reagentsCount, rulesWithSameNumberOfReagents);
-
-				int productsCount = rule.getProductTypes().size();
-				Set<Rule> rulesWithSameNumberOfProducts = this.productsCountToRules.get(productsCount);
-				if (rulesWithSameNumberOfProducts == null) {
-					rulesWithSameNumberOfProducts = new HashSet<>();
-				}
-				rulesWithSameNumberOfProducts.add(rule);
-				this.productsCountToRules.put(productsCount, rulesWithSameNumberOfProducts);
-			}
-			return this;
-		}
-
-		// TODO Refactoring
+		// TODO Consider if needed to use better algorithm
 		private static <T> List<List<T>> permutations(List<T> seq) {
 			if (seq.size() == 1) {
 				return Arrays.asList(seq);
@@ -254,6 +226,11 @@ public class ChemicalReactionsNetwork {
 		}
 
 		private void buildNetwork() {
+
+			this.processRules();
+
+			this.processReactions();
+
 			for (Reaction reaction : this.reactionToReactionNode.keySet()) {
 				ReactionNode reactionNode = this.reactionToReactionNode.get(reaction);
 
@@ -273,6 +250,71 @@ public class ChemicalReactionsNetwork {
 					this.edges.add(Edge.connect(productNode, reactionNode, new ProductReactionCompatibilityPotential(position)));
 				}
 			}
+		}
+
+		private void processRules() {
+			for (Rule rule : this.rules) {
+				int reagentsCount = rule.getReagentTypes().size();
+				Set<Rule> rulesWithSameNumberOfReagents = this.reagentsCountToRules.get(reagentsCount);
+				if (rulesWithSameNumberOfReagents == null) {
+					rulesWithSameNumberOfReagents = new HashSet<>();
+				}
+				rulesWithSameNumberOfReagents.add(rule);
+				this.reagentsCountToRules.put(reagentsCount, rulesWithSameNumberOfReagents);
+
+				int productsCount = rule.getProductTypes().size();
+				Set<Rule> rulesWithSameNumberOfProducts = this.productsCountToRules.get(productsCount);
+				if (rulesWithSameNumberOfProducts == null) {
+					rulesWithSameNumberOfProducts = new HashSet<>();
+				}
+				rulesWithSameNumberOfProducts.add(rule);
+				this.productsCountToRules.put(productsCount, rulesWithSameNumberOfProducts);
+			}
+		}
+
+		public void processReactions() {
+			for (Reaction reaction : this.reactions) {
+				int reagentsCount = reaction.getReagents().size();
+				int productsCount = reaction.getProducts().size();
+
+				Set<Rule> mostProbableRules = this.getMostProbableRulesByReagentsAndProductsCount(reagentsCount, productsCount);
+
+				this.reactionToReactionNode.put(reaction, new ReactionNode(mostProbableRules));
+
+				for (String reagent : reaction.getReagents()) {
+					if (this.compoundToCompoundNode.get(reagent) == null) {
+						this.compoundToCompoundNode.put(reagent, new CompoundNode());
+					}
+				}
+
+				for (String product : reaction.getProducts()) {
+					if (this.compoundToCompoundNode.get(product) == null) {
+						this.compoundToCompoundNode.put(product, new CompoundNode());
+					}
+				}
+			}
+		}
+
+		private Set<Rule> getMostProbableRulesByReagentsAndProductsCount(int reagentsCount, int productsCount) {
+			Set<Rule> mostProbableStatesByReagentsCount = this.reagentsCountToRules.get(reagentsCount);
+			Set<Rule> mostProbableStatesByProductsCount = this.productsCountToRules.get(productsCount);
+
+			Set<Rule> mostProbableRules = new HashSet<>();
+
+			// Intersection of sets
+			if ((mostProbableStatesByProductsCount != null) && (mostProbableStatesByReagentsCount != null)) {
+				for (Rule s : mostProbableStatesByProductsCount) {
+					if (mostProbableStatesByReagentsCount.contains(s)) {
+						mostProbableRules.add(s);
+					}
+				}
+			}
+
+			if (mostProbableRules.isEmpty()) {
+				throw new RuntimeException("Can't find any reactions withs given numbers of products and reagents");
+			}
+
+			return mostProbableRules;
 		}
 
 		public ReactionsNetwork inference(int times) {
@@ -295,7 +337,7 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		public void result() {
+		public void printResults() {
 			for (String compound : this.compoundToCompoundNode.keySet()) {
 				System.out.println(compound + "\t" + this.compoundToCompoundNode.get(compound).getPosteriorProbabilities());
 				System.out.println(compound + "\t" + this.compoundToCompoundNode.get(compound).getMostProbableState());
@@ -346,48 +388,23 @@ public class ChemicalReactionsNetwork {
 
 		private static final double EPSILON = 1e-5;
 
-		private Map<Integer, Set<Rule>> reagentsCountToRules;
+		private Set<Rule> mostProbableStates = null;
 
-		private Map<Integer, Set<Rule>> productsCountToRules;
-
-		private Set<Rule> mostProbableStatesByProductsAndReagentsCount = null;
-
-		public ReactionNode(int reagentsCount, int productsCount, Map<Integer, Set<Rule>> reagentsCountToRules, Map<Integer, Set<Rule>> productsCountToRules) {
-			this.reagentsCountToRules = reagentsCountToRules;
-			this.productsCountToRules = productsCountToRules;
-			this.setMostProbableStatesByReagentsAndProductsCount(reagentsCount, productsCount);
+		public ReactionNode(Set<Rule> mostProbableStates) {
+			this.mostProbableStates = mostProbableStates;
 		}
 
 		@Override
 		public Iterable<Rule> getStates() {
-			return this.mostProbableStatesByProductsAndReagentsCount;
+			return this.mostProbableStates;
 		}
 
 		@Override
 		public double getPriorProbablility(Rule state) {
-			if (this.mostProbableStatesByProductsAndReagentsCount.contains(state)) {
-				return 1.0 / this.mostProbableStatesByProductsAndReagentsCount.size();
+			if (this.mostProbableStates.contains(state)) {
+				return 1.0 / this.mostProbableStates.size();
 			} else {
 				return EPSILON;
-			}
-		}
-
-		public void setMostProbableStatesByReagentsAndProductsCount(int reagentsCount, int productsCount) {
-			Set<Rule> mostProbableStatesByReagentsCount = this.reagentsCountToRules.get(reagentsCount);
-			Set<Rule> mostProbableStatesByProductsCount = this.productsCountToRules.get(productsCount);
-
-			this.mostProbableStatesByProductsAndReagentsCount = new HashSet<>();
-
-			if ((mostProbableStatesByProductsCount != null) && (mostProbableStatesByReagentsCount != null)) {
-				for (Rule s : mostProbableStatesByProductsCount) {
-					if (mostProbableStatesByReagentsCount.contains(s)) {
-						this.mostProbableStatesByProductsAndReagentsCount.add(s);
-					}
-				}
-			}
-
-			if (this.mostProbableStatesByProductsAndReagentsCount.isEmpty()) {
-				throw new RuntimeException("Can't find any reactions withs given numbers of products and reagents");
 			}
 		}
 	}
