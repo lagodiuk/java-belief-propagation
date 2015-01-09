@@ -10,14 +10,18 @@ import com.lahodiuk.bp.example.HammingCodeNetwork.HammingCode;
 
 public class HammingCodeNetworkTest {
 
+	private static final int[] BIT_VALUES = new int[] { 0, 1 };
+
 	@Test
 	public void test() {
-		for (int b1 = 0; b1 < 2; b1++) {
-			for (int b2 = 0; b2 < 2; b2++) {
-				for (int b3 = 0; b3 < 2; b3++) {
-					for (int b4 = 0; b4 < 2; b4++) {
+		for (int dataBit1 : BIT_VALUES) {
+			for (int dataBit2 : BIT_VALUES) {
+				for (int dataBit3 : BIT_VALUES) {
+					for (int dataBit4 : BIT_VALUES) {
 
-						int[] encoded = HammingCodeNetwork.encode(b1, b2, b3, b4);
+						int[] encoded = HammingCodeNetwork.encode(
+								dataBit1, dataBit2, dataBit3, dataBit4);
+
 						// encoded transmitted without errors
 						int[] transmitted = encoded;
 						assertArrayEquals(encoded, this.inferenceMostProbableCode(transmitted));
@@ -26,6 +30,7 @@ public class HammingCodeNetworkTest {
 							// transmit encoded bitstring and flip bit in
 							// specific position
 							transmitted = this.transmitAndFlipBit(encoded, i);
+
 							assertArrayEquals(encoded, this.inferenceMostProbableCode(transmitted));
 						}
 					}
