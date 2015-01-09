@@ -86,6 +86,25 @@ public class HammingCodeNetwork {
 
 		private static Collection<FactorNodeState> STATES;
 
+		/**
+		 * Factor node covers 4 bits
+		 *
+		 * We transform this factor node to node of Pairwise Markov Network
+		 *
+		 * For such transformation - we have to generate all possible states for
+		 * the factor node. E.g.:
+		 *
+		 * 0 0 0 0 <br>
+		 * 1 0 0 0 <br>
+		 * 0 1 0 0 <br>
+		 * ... <br>
+		 * 1 1 1 1 <br>
+		 *
+		 * For more details, read: <br>
+		 * Jonathan S. Yedidia, William T. Freeman, and Yair Weiss <br>
+		 * "Understanding Belief Propagation and its Generalizations" <br>
+		 * (1.5 CONVERTING GRAPHICAL MODELS) <br>
+		 */
 		static {
 			FactorNodeState.STATES = new ArrayList<>();
 
@@ -255,28 +274,28 @@ public class HammingCodeNetwork {
 	}
 
 	/**
-	 * Encoding 4-vector, by appending 3 parity bits: <br/>
-	 * <br/>
-	 * Input: <br/>
-	 * data_vector = (i1 i2 i3 i4) <br/>
-	 * <br/>
-	 * Using: <br/>
-	 * GENERATOR_MATRIX = <br/>
-	 * 1 0 0 0 1 0 1 <br/>
-	 * 0 1 0 0 1 1 1 <br/>
-	 * 0 0 1 0 1 1 0 <br/>
-	 * 0 0 0 1 0 1 1 <br/>
-	 * <br/>
-	 * Result: <br/>
-	 * encoded_vector = data_vector * GENERATOR_MATRIX = (i1 i2 i3 i4 r1 r2 r3) <br/>
-	 * <br/>
-	 * i1, i2, i3, i4 - data bits <br/>
-	 * r1, r2, r3 - parity bits <br/>
-	 * <br/>
-	 * Parity bits satisfies following conditions: <br/>
-	 * i1 xor i2 xor i3 xor r1 == 0 <br/>
-	 * i2 xor i3 xor i4 xor r2 == 0 <br/>
-	 * i1 xor i2 xor i4 xor r3 == 0 <br/>
+	 * Encoding 4-vector, by appending 3 parity bits: <br>
+	 * <br>
+	 * Input: <br>
+	 * data_vector = (i1 i2 i3 i4) <br>
+	 * <br>
+	 * Using: <br>
+	 * GENERATOR_MATRIX = <br>
+	 * 1 0 0 0 1 0 1 <br>
+	 * 0 1 0 0 1 1 1 <br>
+	 * 0 0 1 0 1 1 0 <br>
+	 * 0 0 0 1 0 1 1 <br>
+	 * <br>
+	 * Result: <br>
+	 * encoded_vector = data_vector * GENERATOR_MATRIX = (i1 i2 i3 i4 r1 r2 r3) <br>
+	 * <br>
+	 * i1, i2, i3, i4 - data bits <br>
+	 * r1, r2, r3 - parity bits <br>
+	 * <br>
+	 * Parity bits satisfies following conditions: <br>
+	 * i1 xor i2 xor i3 xor r1 == 0 <br>
+	 * i2 xor i3 xor i4 xor r2 == 0 <br>
+	 * i1 xor i2 xor i4 xor r3 == 0 <br>
 	 *
 	 * @return array [i1, i2, i3, i4, r1, r2, r3]
 	 */
