@@ -160,16 +160,21 @@ public class HammingCodeNetwork {
 		public double getPriorProbablility(FactorNodeState state) {
 			BitNodeState[] bitStates = state.getBitStates();
 
-			boolean xor = bitStates[0].getValue()
-					^ bitStates[1].getValue()
-					^ bitStates[2].getValue()
-					^ bitStates[3].getValue();
+			boolean stateIsAllowed = stateIsAllowed(bitStates);
 
-			if (!xor) {
+			if (stateIsAllowed) {
 				return 0.99;
 			} else {
 				return 0.01;
 			}
+		}
+
+		public boolean stateIsAllowed(BitNodeState[] bitStates) {
+			boolean stateIsAllowed = !(bitStates[0].getValue()
+					^ bitStates[1].getValue()
+					^ bitStates[2].getValue()
+					^ bitStates[3].getValue());
+			return stateIsAllowed;
 		}
 	}
 
