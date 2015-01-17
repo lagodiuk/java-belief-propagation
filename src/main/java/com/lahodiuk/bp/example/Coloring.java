@@ -3,8 +3,10 @@ package com.lahodiuk.bp.example;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.lahodiuk.bp.Edge;
 import com.lahodiuk.bp.Node;
@@ -127,10 +129,11 @@ public class Coloring {
 
 	public static class GraphColorNode extends Node<Color> {
 
-		private static final List<Color> COLORS = Arrays.asList(Color.values());
+		private static final Set<Color> COLORS =
+				new HashSet<>(Arrays.asList(Color.values()));
 
 		@Override
-		public Iterable<Color> getStates() {
+		public Set<Color> getStates() {
 			return COLORS;
 		}
 

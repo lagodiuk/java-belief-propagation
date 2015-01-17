@@ -2,9 +2,10 @@ package com.lahodiuk.bp.example;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import com.lahodiuk.bp.Edge;
 import com.lahodiuk.bp.Node;
@@ -61,8 +62,8 @@ public class HammingCodeNetwork {
 			return this.value;
 		}
 
-		public static Collection<BitNodeState> STATES =
-				Arrays.asList(values());
+		public static Set<BitNodeState> STATES =
+				new HashSet<>(Arrays.asList(values()));
 	}
 
 	private static class FactorNodeState {
@@ -84,7 +85,7 @@ public class HammingCodeNetwork {
 			return this.bitStates;
 		}
 
-		private static Collection<FactorNodeState> STATES;
+		private static Set<FactorNodeState> STATES;
 
 		/**
 		 * Factor node covers 4 bits
@@ -106,7 +107,7 @@ public class HammingCodeNetwork {
 		 * (1.5 CONVERTING GRAPHICAL MODELS) <br>
 		 */
 		static {
-			FactorNodeState.STATES = new ArrayList<>();
+			FactorNodeState.STATES = new HashSet<>();
 
 			for (BitNodeState b0 : BitNodeState.STATES) {
 				for (BitNodeState b1 : BitNodeState.STATES) {
@@ -135,7 +136,7 @@ public class HammingCodeNetwork {
 		}
 
 		@Override
-		public Iterable<BitNodeState> getStates() {
+		public Set<BitNodeState> getStates() {
 			return BitNodeState.STATES;
 		}
 
@@ -152,7 +153,7 @@ public class HammingCodeNetwork {
 	private static class FactorNode extends Node<FactorNodeState> {
 
 		@Override
-		public Iterable<FactorNodeState> getStates() {
+		public Set<FactorNodeState> getStates() {
 			return FactorNodeState.STATES;
 		}
 
@@ -160,7 +161,7 @@ public class HammingCodeNetwork {
 		public double getPriorProbablility(FactorNodeState state) {
 			BitNodeState[] bitStates = state.getBitStates();
 
-			boolean stateIsAllowed = stateIsAllowed(bitStates);
+			boolean stateIsAllowed = this.stateIsAllowed(bitStates);
 
 			if (stateIsAllowed) {
 				return 0.99;

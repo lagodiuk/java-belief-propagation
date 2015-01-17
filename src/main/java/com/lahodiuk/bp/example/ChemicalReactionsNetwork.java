@@ -354,7 +354,8 @@ public class ChemicalReactionsNetwork {
 
 		private static final double EPSILON = 1e-5;
 
-		private static final List<CompoundType> STATES = Arrays.asList(CompoundType.values());
+		private static final Set<CompoundType> STATES =
+				new HashSet<>(Arrays.asList(CompoundType.values()));
 
 		private CompoundType mostProbableState;
 
@@ -366,7 +367,7 @@ public class ChemicalReactionsNetwork {
 		}
 
 		@Override
-		public Iterable<CompoundType> getStates() {
+		public Set<CompoundType> getStates() {
 			return STATES;
 		}
 
@@ -395,7 +396,7 @@ public class ChemicalReactionsNetwork {
 		}
 
 		@Override
-		public Iterable<Rule> getStates() {
+		public Set<Rule> getStates() {
 			return this.mostProbableStates;
 		}
 

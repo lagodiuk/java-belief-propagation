@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class Node<STATES> {
 
-	public abstract Iterable<STATES> getStates();
+	public abstract Set<STATES> getStates();
 
 	public abstract double getPriorProbablility(STATES state);
 
