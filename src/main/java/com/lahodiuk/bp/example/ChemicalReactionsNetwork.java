@@ -201,28 +201,39 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		// TODO Consider if needed to use better algorithm
 		private static <T> List<List<T>> permutations(List<T> seq) {
-			if (seq.size() == 1) {
-				return Arrays.asList(seq);
-			}
-			List<List<T>> perm = permutations(seq.subList(1, seq.size()));
+			List<List<T>> resultsCollector = new ArrayList<>();
+			permutations(new ArrayList<T>(seq),
+					new LinkedList<>(seq),
+					resultsCollector);
+			return resultsCollector;
+		}
 
-			List<List<T>> result = new ArrayList<>();
-			for (List<T> p : perm) {
-				for (int i = 0; i < p.size(); i++) {
-					List<T> r = new LinkedList<>();
-					r.addAll(p.subList(0, i));
-					r.add(seq.get(0));
-					r.addAll(p.subList(i, p.size()));
-					result.add(r);
+		private static <T> void permutations(
+				List<T> buffer,
+				List<T> available,
+				List<List<T>> resultsCollector) {
+
+			if (available.isEmpty()) {
+				// No elements available
+				// Store copy of buffer to results collector
+				resultsCollector.add(new ArrayList<>(buffer));
+			} else {
+				// Calculate index of current position in buffer
+				int position = buffer.size() - available.size();
+				for (int i = 0; i < available.size(); i++) {
+					// Pick element from list of available elements
+					// (decreasing size of available variants by 1)
+					T element = available.remove(i);
+					// Write picked element to buffer into given position
+					buffer.set(position, element);
+					// Generate permutations for the rest of elements
+					permutations(buffer, available, resultsCollector);
+					// Return back picked element
+					available.add(i, buffer.get(position));
+					// And pick next element on next iteration
 				}
-				List<T> r = new LinkedList<>();
-				r.addAll(p);
-				r.add(seq.get(0));
-				result.add(r);
 			}
-			return result;
 		}
 
 		private void buildNetwork() {
