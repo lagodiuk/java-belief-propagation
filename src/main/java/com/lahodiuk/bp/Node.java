@@ -1,9 +1,10 @@
 package com.lahodiuk.bp;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public abstract class Node<STATES> {
@@ -26,8 +27,8 @@ public abstract class Node<STATES> {
 		return this.edges;
 	}
 
-	public Map<STATES, Double> getPosteriorProbabilities() {
-		Map<STATES, Double> stateToLogPriorProbabilityAndProductIncomingMessages =
+	public TObjectDoubleMap<STATES> getPosteriorProbabilities() {
+		TObjectDoubleMap<STATES> stateToLogPriorProbabilityAndProductIncomingMessages =
 				this.getStateToLogPriorProbabilityAndProductIncomingMessages();
 
 		// normalize
@@ -39,8 +40,8 @@ public abstract class Node<STATES> {
 		return stateToLogPriorProbabilityAndProductIncomingMessages;
 	}
 
-	public Map<STATES, Double> getStateToLogPriorProbabilityAndProductIncomingMessages() {
-		Map<STATES, Double> stateToLogPriorProbabilityAndProductIncomingMessages = new HashMap<>();
+	public TObjectDoubleMap<STATES> getStateToLogPriorProbabilityAndProductIncomingMessages() {
+		TObjectDoubleMap<STATES> stateToLogPriorProbabilityAndProductIncomingMessages = new TObjectDoubleHashMap<>();
 		for (STATES state : this.getStates()) {
 			double logProductOfIncomingMessages = 0;
 			for (Edge<?, ?> edge : this.edges) {
@@ -53,7 +54,7 @@ public abstract class Node<STATES> {
 	}
 
 	public STATES getMostProbableState() {
-		Map<STATES, Double> stateToProbability = this.getPosteriorProbabilities();
+		TObjectDoubleMap<STATES> stateToProbability = this.getPosteriorProbabilities();
 		STATES mostProbableState = null;
 		double mostProbableStateProbability = 0;
 		for (STATES state : stateToProbability.keySet()) {

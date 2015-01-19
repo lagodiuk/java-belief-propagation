@@ -1,10 +1,7 @@
 package com.lahodiuk.bp;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 
@@ -14,13 +11,17 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 
 	private Potential<STATES_OF_NODE_1, STATES_OF_NODE_2> potential;
 
-	private Map<STATES_OF_NODE_2, Double> logNode1ToNode2Messages = new HashMap<>();
+	private TObjectDoubleMap<STATES_OF_NODE_2> logNode1ToNode2Messages = new TObjectDoubleHashMap<>();
 
-	private Map<STATES_OF_NODE_2, Double> logNode1ToNode2MessagesNew = new HashMap<>();
+	private TObjectDoubleMap<STATES_OF_NODE_2> logNode1ToNode2MessagesNew = new TObjectDoubleHashMap<>();
 
-	private Map<STATES_OF_NODE_1, Double> logNode2ToNode1Messages = new HashMap<>();
+	private TObjectDoubleMap<STATES_OF_NODE_1> logNode2ToNode1Messages = new TObjectDoubleHashMap<>();
 
-	private Map<STATES_OF_NODE_1, Double> logNode2ToNode1MessagesNew = new HashMap<>();
+	private TObjectDoubleMap<STATES_OF_NODE_1> logNode2ToNode1MessagesNew = new TObjectDoubleHashMap<>();
+
+	private double[] bufferForUpdatingMessagesFromNode2;
+
+	private double[] bufferForUpdatingMessagesFromNode1;
 
 	private Edge(Node<STATES_OF_NODE_1> node1, Node<STATES_OF_NODE_2> node2, Potential<STATES_OF_NODE_1, STATES_OF_NODE_2> potential) {
 		this.potential = potential;
@@ -34,6 +35,9 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 		for (STATES_OF_NODE_2 stateOfNode2 : node2.getStates()) {
 			this.logNode1ToNode2Messages.put(stateOfNode2, 0.0);
 		}
+
+		this.bufferForUpdatingMessagesFromNode2 = new double[this.node2.getStates().size()];
+		this.bufferForUpdatingMessagesFromNode1 = new double[this.node1.getStates().size()];
 	}
 
 	public static <STATES_OF_NODE_1, STATES_OF_NODE_2> Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> connect(
@@ -68,22 +72,24 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 	 * node2 -> node1
 	 */
 	public void updateMessagesNode2ToNode1() {
-		Map<STATES_OF_NODE_2, Double> node2StateToLogPriorProbabilityAndProductIncomingMessages =
+		TObjectDoubleMap<STATES_OF_NODE_2> node2StateToLogPriorProbabilityAndProductIncomingMessages =
 				this.node2.getStateToLogPriorProbabilityAndProductIncomingMessages();
 
 		for (STATES_OF_NODE_1 stateOfNode1 : this.node1.getStates()) {
-			List<Double> sumLogParts = new ArrayList<>();
+			int i = 0;
 			for (STATES_OF_NODE_2 stateOfNode2 : this.node2.getStates()) {
 
 				double logProductOfIncomingMessages =
 						node2StateToLogPriorProbabilityAndProductIncomingMessages.get(stateOfNode2)
 								- this.getLogIncomingMessage(this.node2, stateOfNode2);
 
-				sumLogParts.add(this.node2.getLogPriorProbablility(stateOfNode2)
+				this.bufferForUpdatingMessagesFromNode2[i] = this.node2.getLogPriorProbablility(stateOfNode2)
 						+ this.potential.getLogValue(stateOfNode1, stateOfNode2)
-						+ logProductOfIncomingMessages);
+						+ logProductOfIncomingMessages;
+
+				i += 1;
 			}
-			this.logNode2ToNode1MessagesNew.put(stateOfNode1, logOfSum(sumLogParts));
+			this.logNode2ToNode1MessagesNew.put(stateOfNode1, logOfSum(this.bufferForUpdatingMessagesFromNode2));
 		}
 	}
 
@@ -91,22 +97,24 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 	 * node1 -> node2
 	 */
 	public void updateMessagesNode1ToNode2() {
-		Map<STATES_OF_NODE_1, Double> node1StateToLogPriorProbabilityAndProductIncomingMessages =
+		TObjectDoubleMap<STATES_OF_NODE_1> node1StateToLogPriorProbabilityAndProductIncomingMessages =
 				this.node1.getStateToLogPriorProbabilityAndProductIncomingMessages();
 
 		for (STATES_OF_NODE_2 stateOfNode2 : this.node2.getStates()) {
-			List<Double> sumLogParts = new ArrayList<>();
+			int i = 0;
 			for (STATES_OF_NODE_1 stateOfNode1 : this.node1.getStates()) {
 
 				double logProductOfIncomingMessages =
 						node1StateToLogPriorProbabilityAndProductIncomingMessages.get(stateOfNode1)
 								- this.getLogIncomingMessage(this.node1, stateOfNode1);
 
-				sumLogParts.add(this.node1.getLogPriorProbablility(stateOfNode1)
+				this.bufferForUpdatingMessagesFromNode1[i] = this.node1.getLogPriorProbablility(stateOfNode1)
 						+ this.potential.getLogValue(stateOfNode1, stateOfNode2)
-						+ logProductOfIncomingMessages);
+						+ logProductOfIncomingMessages;
+
+				i += 1;
 			}
-			this.logNode1ToNode2MessagesNew.put(stateOfNode2, logOfSum(sumLogParts));
+			this.logNode1ToNode2MessagesNew.put(stateOfNode2, logOfSum(this.bufferForUpdatingMessagesFromNode1));
 		}
 	}
 
@@ -139,15 +147,15 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 	 * Given: log(X1), log(X2), ... log(Xn) <br/>
 	 * Returns: log(X1 + X2 + ... + Xn)
 	 */
-	public static double logOfSum(Collection<Double> arrLogs) {
-		Double maxLog = arrLogs.iterator().next();
-		for (Double d : arrLogs) {
-			maxLog = Math.max(d, maxLog);
+	public static double logOfSum(double[] arrLogs) {
+		Double maxLog = arrLogs[0];
+		for (int i = 1; i < arrLogs.length; i++) {
+			maxLog = Math.max(arrLogs[i], maxLog);
 		}
 
 		double sumExp = 0.0;
-		for (Double d : arrLogs) {
-			sumExp += Math.exp(d - maxLog);
+		for (int i = 0; i < arrLogs.length; i++) {
+			sumExp += Math.exp(arrLogs[i] - maxLog);
 		}
 
 		return maxLog + Math.log(sumExp);

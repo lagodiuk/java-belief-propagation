@@ -1,5 +1,7 @@
 package com.lahodiuk.bp.example;
 
+import gnu.trove.map.TObjectDoubleMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ public class Coloring {
 
 		for (int i = 1; i <= 10; i++) {
 			System.out.print(i);
-			Map<Color, Double> stateProbability = nodeIdToNode.get(i).getPosteriorProbabilities();
+			TObjectDoubleMap<Color> stateProbability = nodeIdToNode.get(i).getPosteriorProbabilities();
 			for (Color state : stateProbability.keySet()) {
 				System.out.print(String.format("\t %s = %.2f", state, stateProbability.get(state)));
 			}
