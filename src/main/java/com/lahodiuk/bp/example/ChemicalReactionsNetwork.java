@@ -43,10 +43,12 @@ public class ChemicalReactionsNetwork {
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER))
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.SALT, CompoundType.SALT).productTypes(CompoundType.SALT, CompoundType.SALT))
-				// Interesting: it is possible to infer chemical compound types,
-				// even without prior knowledge about any of chemical compounds
-				// (without "seed")
-				// .setPriorCompoundState("Na2O", CompoundType.BASIC_OXIDE)
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.SALT, CompoundType.WATER).productTypes(CompoundType.ACID, CompoundType.BASE))
+
+				// Need some prior knowledge about at least one compound type
+				// (for unambiguous inference)
+				.setPriorCompoundState("H2O", CompoundType.WATER)
+
 				.addReaction(new Reaction().reagents("Na2O", "H2O").products("NaOH"))
 				.addReaction(new Reaction().reagents("K2O", "H2O").products("KOH"))
 				.addReaction(new Reaction().reagents("SO3", "H2O").products("H2SO4"))
@@ -73,7 +75,8 @@ public class ChemicalReactionsNetwork {
 
 				.addReaction(new Reaction().reagents("Al2O3", "H2O").products("Al(OH)3"))
 				.addReaction(new Reaction().reagents("Al(OH)3", "H2CO3").products("Al2(CO3)3", "H2O"))
-				.addReaction(new Reaction().reagents("Al(OH)3", "KOH").products("KAlO2", "H2O"));
+				.addReaction(new Reaction().reagents("Al(OH)3", "KOH").products("KAlO2", "H2O"))
+				.addReaction(new Reaction().reagents("Al(CH3COO)3", "H2O").products("Al(OH)3", "CH3COOH"));
 
 		return reactionsNetwork;
 	}
