@@ -1,4 +1,6 @@
-\documentclass{article}
+\documentclass[12pt]{article}
+
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -9,16 +11,42 @@
 
 \begin{abstract}
 % TODO: refactor
-In this article we will consider representation of information about chemical interactions - from the point of view of graph theory. We will expose some properties of chemical reactions graph in order to infer types of chemical compounds, and do this in polynomial time. And, finally, I would like to provide detailed description of developed programming framework for approximate inference over pairwise Markov Random Fields, with such examples as: decoding of Low-density parity-check codes, Coloring of graph, Fraud detection using network effects.
+In this article we will consider representation of information about chemical interactions - from the point of view of graph theory. We will expose some properties of chemical reactions graph in order to infer types of chemical compounds, and do this in polynomial time. And, finally, I would like to provide detailed description of developed programming framework\cite{project_on_github} for approximate inference over pairwise Markov Random Fields, with appliance to solving of such problems as: decoding of Low-density parity-check codes, Coloring of graph, Fraud detection using network effects\cite{fraud_detection}.
 \end{abstract}
+
+\section{Problem statement}
+Lets imagine simplified universe, where exists only few different \emph{types of chemical compounds}. 
+%TODO: enumerate types of chemical compounds.
+% E.g.: Water, Base, Acid, Salt, Acidic Salt, Acidic Oxide, Basic Oxide
+Also there exists restrictions on \lq \lq allowed\rq \rq\ interactions between different compounds (lets call these restrictions -- \emph{types of chemical reactions}).
+%TODO: enumerate types of chemical reactions.
+% E.g.: Base + Acid --> Salt + Water, Acidic Oxide + Base --> Salt + Water, etc.
+So, this is the only prior knowledge about our simplified universe\footnote{Of course, from the point of view of Chemistry Science - provided model of universe is very rough and strict. But, on the other hand - our model is pretty generic, because it does not depend on details of internal structure of compounds, or any other physical-chemistry factors: \emph{all prior knowledge we have - is just possible types of compounds, and axioms about allowed types of interaction}.}.\\
+
+Now, imagine that we observed reactions of exact chemical compounds.
+% TODO: enumerate examples of observed chemical reactions.
+% E.g.: NaOH + H2SO4 --> Na2SO4 + H2O, Na2O + SO3 --> Na2SO4, etc.
+So, the problem is: \textsl{having described prior knowledge about types of chemical compounds and restrictions on possible types of interactions - needed to \textbf{infer types of compounds, which participate in observed reactions}}. \\
+
+In other words, we can formulate our problem - as \textsl{\textbf{finding of configuration of types of compounds} from observed reactions, \textbf{which does not violate restrictions on allowed types of interaction}}.
+
+\section{Na\"{\i}ve approach}
+
 
 \begin{thebibliography}{9}
 
-\bibitem{lamport94}
+\bibitem{project_on_github}
+  \url{https://github.com/lagodiuk/java-loopy-belief-propagation}.
+
+\bibitem{fraud_detection}
+  Leman Akoglu, Rishi Chandy, Christos Faloutsos,
+  \emph{Opinion Fraud Detection in Online Reviews by Network Effects}.
+
+\bibitem{understanding_bp}
   Jonathan S. Yedidia, William T. Freeman, and Yair Weiss,
   \emph{Understanding Belief Propagation and its Generalizations},
   TR2001-22, 
-  November 2001
+  November 2001.
 
 \end{thebibliography}
 

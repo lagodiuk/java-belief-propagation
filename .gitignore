@@ -41,3 +41,4 @@ Thumbs.db
 *.pdf
 *.synctex.gz
 *.aux
+*.out
