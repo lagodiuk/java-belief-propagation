@@ -34,3 +34,10 @@ target/
 .DS_Store
 Icon?
 Thumbs.db
+
+#
+# MacTex
+#
+*.pdf
+*.synctex.gz
+*.aux
