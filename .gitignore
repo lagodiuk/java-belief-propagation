@@ -42,3 +42,4 @@ Thumbs.db
 *.synctex.gz
 *.aux
 *.out
+*.dot
