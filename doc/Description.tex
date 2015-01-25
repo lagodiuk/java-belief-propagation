@@ -1,6 +1,8 @@
 \documentclass[12pt]{article}
 
 \usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 
 \begin{document}
 
@@ -28,10 +30,50 @@ Now, imagine that we observed reactions of exact chemical compounds.
 % E.g.: NaOH + H2SO4 --> Na2SO4 + H2O, Na2O + SO3 --> Na2SO4, etc.
 So, the problem is: \textsl{having described prior knowledge about types of chemical compounds and restrictions on possible types of interactions - needed to \textbf{infer types of compounds, which participate in observed reactions}}. \\
 
-In other words, we can formulate our problem - as \textsl{\textbf{finding of configuration of types of compounds} from observed reactions, \textbf{which does not violate restrictions on allowed types of interaction}}.
+In other words, we can formulate our problem - as \textsl{\textbf{finding of such configuration of types of compounds} from observed reactions, \textbf{which does not violate restrictions on allowed types of interaction}}.
 
 \section{Na\"{\i}ve approach}
+The most straightforward approach for solving of described problem -- would be just brute-force search of appropriate types for chemical compounds from observed reactions:
 
+\begin{algorithm}
+\caption{Brute-force search for appropriate types of compounds}\label{alg:brute_force}
+\begin{algorithmic}[1]
+\Procedure{AssignTypes}{$compoundTypeMap, compoundsList$}
+    \If{\Call{Empty}{$compoundsList$}}
+        \If{\Call{SolutionAcceptable}{$compoundTypeMap$}}
+            \State \textbf{return $compoundTypeMap$}
+        \EndIf
+    \Else
+        \State $compound \gets \Call{Head}{compoundsList}$
+        \State $restCompounds \gets \Call{Tail}{compoundsList}$
+        \For{$i \gets [1..\Call{Size}{PossibleCompoundTypes}]$}
+            \State $type \gets PossibleCompoundTypes[i]$
+            \State $compoundTypeMap[compound] \gets type$
+            \State \Call{AssignTypes}{$compoundTypeMap,restCompounds$}
+        \EndFor
+    \EndIf
+    %TODO: consider, whether it is fine to return sich message
+    \State \textbf{return} \lq \lq Solution Does Not Exist\rq \rq
+\EndProcedure
+\\
+\Procedure{SolutionAcceptable}{$compoundTypeMap$}
+    \For{$i \gets [1..\Call{Size}{ObservedEquations}]$}
+        \State $equation \gets ObservedEquations[i]$
+        %TODO: consider better name than x
+        %TODO: add comment to this function. E.g.: 
+        % Input: "NaOH + H2SO4 --> Na2SO4 + H2O"
+        % Output: "Base + Acid --> Salt + Water"
+        \State $x \gets \Call{SubstituteTypes}{$equation, compoundTypeMap$}$
+        \If{\Call{NotContains}{PossibleEquationTypes, x}}
+            \State \textbf{return $false$}
+        \EndIf
+    \EndFor
+    \State \textbf{return $true$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+The problem of given approach, is such, that it leads to exponential complexity, with growth of number of observed compounds.
 
 \begin{thebibliography}{9}
 
