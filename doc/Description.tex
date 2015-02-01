@@ -1,11 +1,27 @@
 \documentclass[12pt]{article}
 
+% Defining page margins
 \usepackage[top=1in, bottom=1.5in, left=1in, right=1in]{geometry}
+% Ability to generate urls
 \usepackage{hyperref}
+% Ability to display pseudocode
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
+% Nice graphs
 \usepackage{tikz}
+% Nice arrows for directed graphs
 \usetikzlibrary{arrows.meta,arrows}
+% Define colors + coloring cells o tables
+\usepackage{color, colortbl}
+% Text over right arrow (see: http://tex.stackexchange.com/questions/103988/rightarrow-with-text-above-it)
+\usepackage{mathtools}
+
+% Ability to create cells with few lines of text
+% see: http://tex.stackexchange.com/questions/2441/how-to-add-a-forced-line-break-inside-a-table-cell
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+  
+\definecolor{Gray}{gray}{0.9}
 
 \begin{document}
 
@@ -21,11 +37,41 @@ In this article we will consider representation of information about chemical in
 
 \section{Problem statement}
 Lets imagine simplified universe, where exists only few different \emph{types of chemical compounds}. 
-%TODO: enumerate types of chemical compounds.
-% E.g.: Water, Base, Acid, Salt, Acidic Salt, Acidic Oxide, Basic Oxide
 Also there exists restrictions on \lq \lq allowed\rq \rq\ interactions between different compounds (lets call these restrictions -- \emph{types of chemical reactions}).
-%TODO: enumerate types of chemical reactions.
-% E.g.: Base + Acid --> Salt + Water, Acidic Oxide + Base --> Salt + Water, etc.
+
+\begin{table}[!htb]
+    \begin{minipage}{.2\linewidth}
+      \centering
+        \begin{tabular}{| l |}
+            \hline
+            \rowcolor{Gray}
+            \specialcell{Compound \\ Type} \\ \hline
+            $Water$ \\ \hline
+            $Base$ \\ \hline
+            $Acid$ \\ \hline
+            $Salt$ \\ \hline
+            $Acidic\ Salt$ \\ \hline
+            $Acidic\ Oxide$ \\ \hline
+            $Basic\ Oxide$ \\ \hline
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.8\linewidth}
+      \centering
+        \begin{tabular}{| l | l |}
+            \hline
+            \rowcolor{Gray}
+            Reaction Type & Example \\ \hline
+            $Base + Acid \rightarrow Salt + Water$ & $2NaOH + H_{2}SO_{4} \rightarrow Na_{2}SO_{4} + 2H_{2}O$ \\ \hline
+            $Base + Acid \rightarrow Acidic\ Salt + Water$ & $NaOH + H_{2}SO_{4} \rightarrow NaHSO_{4} + H_{2}O$ \\ \hline
+            $Acidic\ Salt + Base \rightarrow Salt + Water$ & $NaHSO_{4} + NaOH \rightarrow Na_{2}SO_{4} + H_{2}O$ \\ \hline
+            $Basic\ Oxide + Water \rightarrow Base$ & $Na_{2}O + H_{2}O \rightarrow 2NaOH$ \\ \hline
+            $Acidic\ Oxide + Water \rightarrow Acid$ & $SO_3 + H_{2}O \rightarrow H_{2}SO_4$ \\ \hline
+            $Acidic\ Oxide + Base \rightarrow Salt + Water$ & $SO_3 + 2NaOH \xrightarrow{t} Na_{2}SO_4 + H_{2}O$ \\ \hline            
+            $Salt + Water \rightarrow Base + Acid$ & \specialcell{$Al_{2}(SO_{4})_3 + 6H_{2}O \xrightarrow{t}$ \\ \hspace{5em}$2Al(OH)_3 + 3H_{2}SO_4$} \\ \hline            
+        \end{tabular}
+    \end{minipage} 
+\end{table}
+
 So, this is the only prior knowledge about our simplified universe\footnote{Of course, from the point of view of Chemistry Science - provided model of universe is very rough and strict. But, on the other hand - our model is pretty generic, because it does not depend on details of internal structure of compounds, or any other physical-chemistry factors: \emph{all prior knowledge we have - is just possible types of compounds, and axioms about allowed types of interaction}.}.\\
 
 Now, imagine that we observed reactions of exact chemical compounds.
@@ -80,13 +126,13 @@ The problem of given approach, is such, that it leads to exponential complexity,
 
 \section{Chemical reactions as a graph}
 
-It is natural to represent observed chemical reactions as a bipartite graph: 
+Lets represent observed chemical reactions as a bipartite graph: 
 \begin{itemize}
     \setlength \itemsep{0em}
     \item Each unique chemical compound will be represented as \emph{compound node}
     \item Each observed reaction will be represented as \emph{reaction node}
     \item In case, if chemical compound participate in reaction -- we will connect corresponding \emph{compound node} with corresponding \emph{reaction node}
-    \item Direction of edge reflects role of chemical compound in reaction (\textbf{for reagents}: \emph{direction from compound node -- to reaction node}, and \textbf{for products}: \emph{direction from reaction node -- to compound node})
+    \item Direction of edge -- reflects role of chemical compound in reaction (\textbf{for reagents}: \emph{from compound node -- to reaction node}, and \textbf{for products}: \emph{from reaction node -- to compound node})
 \end{itemize}
 
 \noindent For example, for subset of given three reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose, coefficients does nor matter.}:
@@ -106,9 +152,9 @@ It is natural to represent observed chemical reactions as a bipartite graph:
     -{Latex[length=3mm]},
     shorten >=1pt,
     auto,
-    node distance=2.4cm,
+    node distance=2.6cm,
     thick,
-    compound node/.style={circle,fill=blue!20,draw},
+    compound node/.style={circle,fill=blue!20,minimum width=2cm,draw},
     reaction node/.style={draw,thick,fill=green!20,inner sep=.3cm}]
 
   \node[compound node] (NaOH) {$NaOH$};
