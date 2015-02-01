@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[10pt]{article}
 
 % Defining page margins
 \usepackage[top=1in, bottom=1.5in, left=1in, right=1in]{geometry}
@@ -21,6 +21,10 @@
 \newcommand{\specialcell}[2][c]{%
   \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
   
+% Align comment in the same way as Stetements in pseudocode
+% see: http://tex.stackexchange.com/questions/74880/algorithmicx-package-comments-on-a-single-line
+\algnewcommand{\LineComment}[1]{\State \indent \(\triangleright\) #1}
+  
 \definecolor{Gray}{gray}{0.9}
 
 \begin{document}
@@ -32,12 +36,12 @@
 
 \begin{abstract}
 % TODO: refactor
-In this article we will consider representation of information about chemical interactions - from the point of view of graph theory. We will expose some properties of chemical reactions graph in order to infer types of chemical compounds, and do this in polynomial time. And, finally, I would like to provide detailed description of developed programming framework\cite{project_on_github} for approximate inference over pairwise Markov Random Fields, with appliance to solving of such problems as: decoding of Low-density parity-check codes, Coloring of graph, Fraud detection using network effects\cite{fraud_detection}.
+In this article we will consider representation of information about chemical reactions - from the point of view of graph theory. We will expose some properties of chemical reactions graph in order to infer types of chemical compounds, and do this in polynomial time. And, finally, I would like to provide detailed description of developed programming framework\cite{project_on_github} for approximate inference over pairwise Markov Random Fields, with appliance to such examples as: decoding of Low-density parity-check codes, Coloring of graph, Fraud detection using network effects\cite{fraud_detection}.
 \end{abstract}
 
 \section{Problem statement}
 Lets imagine simplified universe, where exists only few different \emph{types of chemical compounds}. 
-Also there exists restrictions on \lq \lq allowed\rq \rq\ interactions between different compounds (lets call these restrictions -- \emph{types of chemical reactions}).
+Also there exists restrictions on \lq \lq allowed\rq \rq\ interactions between different kinds of compounds (lets call these restrictions -- \emph{types of chemical reactions}). For example:
 
 \begin{table}[!htb]
     \begin{minipage}{.2\linewidth}
@@ -81,12 +85,31 @@ So, the problem is: \textsl{having described prior knowledge about types of chem
 
 In other words, we can formulate our problem - as \textsl{\textbf{finding of such configuration of types of compounds} from observed reactions, \textbf{which does not violate restrictions on allowed types of interaction}}.
 
+\newpage
+
 \section{Na\"{\i}ve approach}
-The most straightforward approach for solving of described problem -- would be just brute-force search of appropriate types for chemical compounds from observed reactions:
+The most straightforward approach for solving of described problem -- would be just \emph{brute-force search} of appropriate types for chemical compounds from observed reactions:
 
 \begin{algorithm}
 \caption{Brute-force search for appropriate types of compounds}\label{alg:brute_force}
 \begin{algorithmic}[1]
+
+\State \textbf{preliminary remarks:}
+\LineComment{\emph{PossibleCompoundTypes} - Array of possible types of compounds}
+\LineComment{e.g.: [$Water$, $Base$, $Salt$, $Acid$, $\ldots$]}
+\\
+\LineComment{\emph{PossibleEquationTypes} -- Set of possible types of reactions}
+\LineComment{e.g.: \{$Water + Basic\ Oxode \rightarrow Base$, $Acid + Base \rightarrow Salt + Water$, $\ldots$\}}
+\\
+\LineComment{\emph{ObservedEquations} -- Array of observed reactions}
+\LineComment{e.g.: [$NaOH + H_{2}SO_4 \rightarrow H_{2}O + Na_{2}SO_4$, $\ldots$]}
+\\
+\LineComment{\emph{compoundsList} -- List of compounds (from observed reactions)}
+\LineComment{e.g.: [$H_{2}O$, $NaOH$, $H_{2}SO_4$, $Na_{2}SO_4$, $\ldots$]}
+\\
+\LineComment{\emph{compoundTypeMap} -- Map with hypothesis about types of compounds (from observed reactions)}
+\LineComment{e.g.: \{$H_{2}O \rightarrow Water$, $NaOH \rightarrow Base$, $\ldots$\}}
+\\
 \Procedure{AssignTypes}{$compoundTypeMap, compoundsList$}
     \If{\Call{Empty}{$compoundsList$}}
         \If{\Call{SolutionAcceptable}{$compoundTypeMap$}}
@@ -101,7 +124,7 @@ The most straightforward approach for solving of described problem -- would be j
             \State \Call{AssignTypes}{$compoundTypeMap,restCompounds$}
         \EndFor
     \EndIf
-    %TODO: consider, whether it is fine to return sich message
+    %TODO: consider, whether it is fine to return such message
     \State \textbf{return} \lq \lq Solution Does Not Exist\rq \rq
 \EndProcedure
 \\
@@ -109,10 +132,8 @@ The most straightforward approach for solving of described problem -- would be j
     \For{$i \gets [1..\Call{Size}{ObservedEquations}]$}
         \State $equation \gets ObservedEquations[i]$
         %TODO: consider better name than x
-        %TODO: add comment to this function. E.g.: 
-        % Input: "NaOH + H2SO4 --> Na2SO4 + H2O"
-        % Output: "Base + Acid --> Salt + Water"
         \State $x \gets \Call{SubstituteTypes}{$equation, compoundTypeMap$}$
+        \LineComment{e.g.: substituting $NaOH + H_{2}SO_4 \rightarrow H_{2}O + Na_{2}SO_4$ to $Acid + Base \rightarrow Salt + Water$}
         \If{\Call{NotContains}{PossibleEquationTypes, x}}
             \State \textbf{return $false$}
         \EndIf
@@ -124,18 +145,20 @@ The most straightforward approach for solving of described problem -- would be j
 
 The problem of given approach, is such, that it leads to exponential complexity, with growth of number of observed compounds.
 
+\newpage
+
 \section{Chemical reactions as a graph}
 
-Lets represent observed chemical reactions as a bipartite graph: 
+Lets represent observed chemical reactions as a graph: 
 \begin{itemize}
     \setlength \itemsep{0em}
     \item Each unique chemical compound will be represented as \emph{compound node}
     \item Each observed reaction will be represented as \emph{reaction node}
-    \item In case, if chemical compound participate in reaction -- we will connect corresponding \emph{compound node} with corresponding \emph{reaction node}
-    \item Direction of edge -- reflects role of chemical compound in reaction (\textbf{for reagents}: \emph{from compound node -- to reaction node}, and \textbf{for products}: \emph{from reaction node -- to compound node})
+    \item In case, if chemical compound participate in reaction -- we will connect corresponding \emph{compound node} with corresponding \emph{reaction node}\footnote{Based on this condition we can conclude, that constructed graph is actually \emph{bipartite graph}}
+    \item Direction of edge -- reflects role of chemical compound in reaction (\textbf{for reagents}: \emph{direction from compound node -- to reaction node}, and \textbf{for products}: \emph{direction from reaction node -- to compound node})
 \end{itemize}
 
-\noindent For example, for subset of given three reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose, coefficients does nor matter.}:
+\noindent For example, for subset of given three observed reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose, coefficients does nor matter.}:
 
 \begin{enumerate}
     \setlength \itemsep{0em}
@@ -154,7 +177,7 @@ Lets represent observed chemical reactions as a bipartite graph:
     auto,
     node distance=2.6cm,
     thick,
-    compound node/.style={circle,fill=blue!20,minimum width=2cm,draw},
+    compound node/.style={circle,fill=blue!20,minimum width=1.7cm,draw},
     reaction node/.style={draw,thick,fill=green!20,inner sep=.3cm}]
 
   \node[compound node] (NaOH) {$NaOH$};
