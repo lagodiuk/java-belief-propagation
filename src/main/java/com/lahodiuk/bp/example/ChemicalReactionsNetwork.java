@@ -34,15 +34,28 @@ public class ChemicalReactionsNetwork {
 
 	public static ReactionsNetwork configureReactionsNetwork() {
 		ReactionsNetwork reactionsNetwork = new ReactionsNetwork()
+				// Na2O + H2O --> NaOH
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.BASE))
+				// SO3 + H2O --> H2SO4
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.ACIDIC_OXIDE, CompoundType.WATER).productTypes(CompoundType.ACID))
+				// Na2O + SO3 --> Na2SO4
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT))
+				// NaOH + H2SO4 --> Na2SO4 + H2O
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+				// NaOH + H2SO4 --> NaHSO4 + H2O
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACID).productTypes(CompoundType.ACID_SALT, CompoundType.WATER))
+				// NaHSO4 + NaOH --> Na2SO4 + H2O
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.ACID_SALT, CompoundType.BASE).productTypes(CompoundType.SALT, CompoundType.WATER))
+				// NaOH + SO3 --> Na2SO4 + H2O (heating)
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASE, CompoundType.ACIDIC_OXIDE).productTypes(CompoundType.SALT, CompoundType.WATER))
+				// Na2O + H2SO4 --> Na2SO4 + H2O
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.BASIC_OXIDE, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.WATER))
+				// AgNO3 + NaCl --> AgCl (sediment) + NaNO3
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.SALT, CompoundType.SALT).productTypes(CompoundType.SALT, CompoundType.SALT))
+				// Na2CO3 + H2SO4 --> Na2SO4 + H2CO3
+				// (actually, H2CO3 is not stable, and transforms to CO2 + H2O)
+				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.SALT, CompoundType.ACID).productTypes(CompoundType.SALT, CompoundType.ACID))
+				// Al2(SO4)3 + H2O --> Al(OH)3 + H2SO4 (heating)
 				.addRuleWithAllowedPermutations(new Rule().reagentTypes(CompoundType.SALT, CompoundType.WATER).productTypes(CompoundType.ACID, CompoundType.BASE))
 
 				// Need some prior knowledge about at least one compound type
