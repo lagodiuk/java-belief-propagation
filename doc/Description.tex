@@ -169,7 +169,7 @@ Lets represent observed chemical reactions as a graph:
 
 \noindent We will construct following graph:
 
-\centering{
+
 % Might be helpful for the further refactoring: http://www.texample.net/tikz/examples/feature/nodes-and-shapes/
 \begin{tikzpicture}[
     -{Latex[length=3mm]},
@@ -211,7 +211,10 @@ Lets represent observed chemical reactions as a graph:
     (Reaction3) 
          edge [bend right = 90] node [right] {} (NaOH);
 \end{tikzpicture}
-}
+
+In given representation -- each of compound nodes corresponds to unique chemical compound. And, as far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node is implicitly belongs to corresponding compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}.
+
+Taking into account the fact about implicit correspondence between graph nodes and types of reactions and compounds -- we might conclude, that type of chemical compound is defined only by types of chemical reactions, in which given compound participate.
 
 \newpage
 
