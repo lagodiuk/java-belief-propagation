@@ -71,7 +71,7 @@ Also there exists restrictions on \lq \lq allowed\rq \rq\ interactions between d
             $Basic\ Oxide + Water \rightarrow Base$ & $Na_{2}O + H_{2}O \rightarrow 2NaOH$ \\ \hline
             $Acidic\ Oxide + Water \rightarrow Acid$ & $SO_3 + H_{2}O \rightarrow H_{2}SO_4$ \\ \hline
             $Acidic\ Oxide + Base \rightarrow Salt + Water$ & $SO_3 + 2NaOH \xrightarrow{t} Na_{2}SO_4 + H_{2}O$ \\ \hline            
-            $Salt + Water \rightarrow Base + Acid$ & \specialcell{$Al_{2}(SO_{4})_3 + 6H_{2}O \xrightarrow{t}$ \\ \hspace{5em}$2Al(OH)_3 + 3H_{2}SO_4$} \\ \hline            
+            $Salt + Water \rightarrow Base + Acid$ & \specialcell{$Al_{2}(SO_{4})_3 + 6H_{2}O \xrightarrow{t}$ \\ \hspace{5em}$2Al(OH)_3 \downarrow + 3H_{2}SO_4$} \\ \hline            
         \end{tabular}
     \end{minipage} 
 \end{table}
@@ -99,16 +99,16 @@ The most straightforward approach for solving of described problem -- would be j
 \LineComment{e.g.: [$Water$, $Base$, $Salt$, $Acid$, $\ldots$]}
 \\
 \LineComment{\emph{PossibleEquationTypes} -- Set of possible types of reactions}
-\LineComment{e.g.: \{$Water + Basic\ Oxode \rightarrow Base$, $Acid + Base \rightarrow Salt + Water$, $\ldots$\}}
+\LineComment{e.g.: \{\lq \lq$Water + Basic\ Oxode \rightarrow Base$\rq \rq , \lq \lq$Acid + Base \rightarrow Salt + Water$\rq \rq, $\ldots$\}}
 \\
 \LineComment{\emph{ObservedEquations} -- Array of observed reactions}
-\LineComment{e.g.: [$NaOH + H_{2}SO_4 \rightarrow H_{2}O + Na_{2}SO_4$, $\ldots$]}
+\LineComment{e.g.: [\lq \lq$NaOH + H_{2}SO_4 \rightarrow H_{2}O + Na_{2}SO_4$\rq \rq, $\ldots$]}
 \\
 \LineComment{\emph{compoundsList} -- List of compounds (from observed reactions)}
 \LineComment{e.g.: [$H_{2}O$, $NaOH$, $H_{2}SO_4$, $Na_{2}SO_4$, $\ldots$]}
 \\
 \LineComment{\emph{compoundTypeMap} -- Map with hypothesis about types of compounds (from observed reactions)}
-\LineComment{e.g.: \{$H_{2}O \rightarrow Water$, $NaOH \rightarrow Base$, $\ldots$\}}
+\LineComment{e.g.: \{$H_{2}O \Rightarrow Water$, $NaOH \Rightarrow Base$, $\ldots$\}}
 \\
 \Procedure{AssignTypes}{$compoundTypeMap, compoundsList$}
     \If{\Call{Empty}{$compoundsList$}}
@@ -131,10 +131,10 @@ The most straightforward approach for solving of described problem -- would be j
 \Procedure{SolutionAcceptable}{$compoundTypeMap$}
     \For{$i \gets [1..\Call{Size}{ObservedEquations}]$}
         \State $equation \gets ObservedEquations[i]$
-        %TODO: consider better name than x
-        \State $x \gets \Call{SubstituteTypes}{$equation, compoundTypeMap$}$
-        \LineComment{e.g.: substituting $NaOH + H_{2}SO_4 \rightarrow H_{2}O + Na_{2}SO_4$ to $Acid + Base \rightarrow Salt + Water$}
-        \If{\Call{NotContains}{PossibleEquationTypes, x}}
+        \State $subst \gets \Call{SubstituteTypes}{equation, compoundTypeMap}$
+        \LineComment{e.g.: substituting \lq \lq $NaOH + H_{2}SO_4 \rightarrow H_{2}O + Na_{2}SO_4$\rq \rq}
+         \LineComment{to \lq \lq $Acid + Base \rightarrow Salt + Water$\rq \rq}
+        \If{$\Call{NotContains}{PossibleEquationTypes, subst}$}
             \State \textbf{return $false$}
         \EndIf
     \EndFor
@@ -214,12 +214,12 @@ Lets represent observed chemical reactions as a graph:
 
 As far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}\footnote{In other words -- each node of graph associated with \emph{random variable}, which depends either on compound or reaction type}.
 
-Without loss of generalization -- we can state, that \emph{type of chemical compound depends only on types of reactions, in which given compound participates} (and vice versa -- type of chemical reaction depends only on types of compounds, which participate in given reaction).
+Without loss of generalization -- we can state, that \emph{type of chemical compound depends only on types of reactions, in which given compound participates} (and vice versa -- type of chemical reaction depends only on types of compounds, which participate in given reaction). For illustration of this statement, lets consider following example: 
 \\
-
-\noindent For illustration of this statement, lets consider tiny example -- having information that compound $X$ participates in reactions of following types:
+\\
+Having information -- that compound $X$ participates in reactions of following types:
 \begin{itemize}
-    \item $Basic\ Oxide + Acidic\ Oxide \rightarrow Salt$
+    \item $Acidic\ Oxide + Basic\ Oxide \rightarrow Salt$
     \item $Basic\ Oxide + Water \rightarrow Base$
 \end{itemize}
 We can easily \emph{infer} that type of compound $X$ is $Basic\ Oxide$.
@@ -228,10 +228,10 @@ We can easily \emph{infer} that type of compound $X$ is $Basic\ Oxide$.
 \noindent Such property of graph of chemical reactions might be formalized as -- \emph{conditional independence of random variables of non-adjacent nodes}. This means, that graph of chemical reactions is actually \emph{\textbf{Pairwise Markov Random Field}} \cite{wikipedia_mrf}.
 \\
 
-Using Hammersley-Clifford Theorem \cite{hammersley_clifford_proof, wikipedia_hammersley_clifford} -- we can follow up, that probability distribution of configurations of graph might be factorized into positive functions defined on cliques that cover all the nodes and edges (this also called a \emph{Gibbs distribution}):
+Using Hammersley-Clifford Theorem\footnote{} -- we can follow up, that probability distribution of configurations of graph might be factorized into positive functions defined on cliques that cover all the nodes and edges (this also called a \emph{Gibbs distribution})\cite{hammersley_clifford_proof, wikipedia_hammersley_clifford}:
 
 \begin{equation}
-P(X) = {1 \over Z} \prod_{c \in C_G} \phi_{c}(X_c)
+P(X) = {1 \over Z} \prod_{c \in C_G} \psi_{c}(X_c)
 \end{equation}
 where $Z = \sum_{X \in X} P(X)$
 
