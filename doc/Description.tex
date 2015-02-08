@@ -158,7 +158,7 @@ Lets represent observed chemical reactions as a graph:
     \item Direction of edge -- reflects role of chemical compound in reaction (\textbf{for reagents}: \emph{direction from compound node -- to reaction node}, and \textbf{for products}: \emph{direction from reaction node -- to compound node})
 \end{itemize}
 
-\noindent For example, lets consider subset of three observed reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose, coefficients does nor matter.}:
+\noindent For example, lets consider subset of three observed reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose, coefficients does nor matter}:
 
 \begin{enumerate}
     \setlength \itemsep{0em}
@@ -212,26 +212,39 @@ Lets represent observed chemical reactions as a graph:
          edge [bend right = 90] node [right] {} (NaOH);
 \end{tikzpicture}
 
-As far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}\footnote{In other words -- each node of graph associated with \emph{random variable}, which depends either on compound or reaction type}.
+As far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}. In other words, each node of graph associated with \emph{discrete-valued random variable}: $X_i$, which corresponds either to compound type or reaction type: $x_i$. This can be represented using notation: $X_i = x_i$. 
+
+For example, imagine compound node of graph, which corresponds to chemical compound $NaOH$, so, the possible affiliation of given compound node to type \lq \lq $Base$\rq \rq, might be denoted as: $X_{NaOH} = Base$.
+\\
+
+In general, we can denote following notation for describing of probability of some specific configuration of node types of entire graph: $P(X_1 = x_1, X_2 = x_2, \cdots , X_n = x_n)$. Using a little bit more succinct notation: $P(X_1 = x_1, X_2 = x_2, \cdots , X_n = x_n) = P(x_1, x_2, \cdots , x_n) = P(x)$.
+\\
 
 Without loss of generalization -- we can state, that \emph{type of chemical compound depends only on types of reactions, in which given compound participates} (and vice versa -- type of chemical reaction depends only on types of compounds, which participate in given reaction). For illustration of this statement, lets consider following example: 
 \\
 \\
 Having information -- that compound $X$ participates in reactions of following types:
-\begin{itemize}
+\begin{enumerate}
     \item $Acidic\ Oxide + Basic\ Oxide \rightarrow Salt$
     \item $Basic\ Oxide + Water \rightarrow Base$
-\end{itemize}
-We can easily \emph{infer} that type of compound $X$ is $Basic\ Oxide$.
+\end{enumerate}
+We can easily \emph{infer} type of compound $X$: 
+\begin{enumerate}
+    \item For the first type of reaction: $Acidic\ Oxide + Basic\ Oxide \rightarrow Salt$ \\
+             Set of possible compound types of $X$ is: $T_1 = \{Acidic\ Oxide, Basic\ Oxide, Salt\}$
+    \item For the second type of reaction: $Basic\ Oxide + Water \rightarrow Base$ \\
+             Set of possible compound types of $X$ is: $T_2 = \{Basic\ Oxide, Water, Base\}$
+\end{enumerate}
+So, the type of compound $X$ is $T_1 \cap T_2 = \{Basic\ Oxide\}$.
 \\
 
-\noindent Such property of graph of chemical reactions might be formalized as -- \emph{conditional independence of random variables of non-adjacent nodes}. This means, that graph of chemical reactions is actually \emph{\textbf{Pairwise Markov Random Field}} \cite{wikipedia_mrf}.
+\noindent Such property of graph of chemical reactions might be formalized as -- \emph{conditional independence of random variables of non-adjacent nodes}. This means, that graph of chemical reactions is actually can be treated as \emph{\textbf{Markov Random Field}} \cite{wikipedia_mrf}.
 \\
 
-Using Hammersley-Clifford Theorem\footnote{} -- we can follow up, that probability distribution of configurations of graph might be factorized into positive functions defined on cliques that cover all the nodes and edges (this also called a \emph{Gibbs distribution})\cite{hammersley_clifford_proof, wikipedia_hammersley_clifford}:
+Using result of Hammersley-Clifford Theorem -- we can follow up, that probability distribution of configurations of graph might be factorized into positive functions defined on cliques that cover all the nodes and edges (also called a \emph{Gibbs distribution})\cite{hammersley_clifford_proof, wikipedia_hammersley_clifford}:
 
 \begin{equation}
-P(X) = {1 \over Z} \prod_{c \in C_G} \psi_{c}(X_c)
+P(x) = {1 \over Z} \prod_{c \in C_G} \psi_{c}(x_c)
 \end{equation}
 where $Z = \sum_{X \in X} P(X)$
 
