@@ -212,7 +212,42 @@ Lets represent observed chemical reactions as a graph:
          edge [bend right = 90] node [right] {} (NaOH);
 \end{tikzpicture}
 
-As far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}. In other words, each node of graph associated with \emph{discrete-valued random variable}: $X_i$, which corresponds either to compound type or reaction type: $x_i$. This can be represented using notation: $X_i = x_i$. 
+\newpage
+
+\section{Notation}
+
+\noindent To move forward, it is useful to define notation for compound types and reaction types:
+\begin{itemize}
+
+    \item Lets treat each reaction type as element of finite set: $CompoundTypes$. \\
+    For example, $CompoundTypes = \{Base, Water, Acid, Salt\}$
+
+    \item Lets treat each reaction type as a tuple with two attributes -- reagents and products. At the same time -- reagents and products will be also represented as a tuples. 
+
+For example, reaction of type: \lq \lq$Base + Acid \rightarrow Salt + Water$\rq \rq \ can be represented as: \\
+$(reagents: (Base, Acid),\ products: (Salt, Water))$ \\ \\
+In general, reaction type \lq \lq$r_1 + r_2 + \cdots + r_n \rightarrow p_1 + p_2 + \cdots + p_m$\rq \rq \ -- will be represented as tuple:
+\begin{equation} \label{eq:reaction_type_notation}
+T = (reagents:(r_1, r_2, \cdots , r_n),\ products:(p_1, p_2, \cdots , p_m))
+\end{equation}
+Where $r_i \in CompoundTypes$ (for all $i$), and $p_j \in CompoundTypes$ (for all $j$). \\
+So, lets treat all reaction types as finite set of described tuples: $ReactionTypes$.
+
+    \item Imagine, that we have reaction type $T$ (such, that $T \in ReactionTypes$). Lets use following notation for accessing to type of $k$-th reagent of reaction type $T$:
+\begin{equation} \label{eq:access_reagent_type_notation}
+r_k = reagent_k(T)
+\end{equation}   
+(where $r_k \in CompoundTypes$) \\
+
+And the same for accessing $n$-th product of reaction $T$:
+\begin{equation} \label{eq:access_product_type_notation}
+p_n = product_n(T)
+\end{equation}   
+(where $p_n \in CompoundTypes$)
+
+\end{itemize}
+
+\noindent As far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}. In other words, each node of graph associated with \emph{discrete-valued random variable}: $X_i$, which corresponds either to compound type or reaction type: $x_i$ (such, that $x_i \in CompoundTypes$, or $x_i \in ReactionTypes$). This can be represented using notation: $X_i = x_i$. 
 
 For example, imagine node of graph, which corresponds to chemical compound $NaOH$, so, the possible affiliation of given compound node to type \lq \lq $Base$\rq \rq, might be denoted as: $X_{NaOH} = Base$.
 \\
@@ -256,10 +291,11 @@ where:
     \item $Z$ -- normalization constant
     \item $x$ -- configuration of node types of entire graph, as described in equation \eqref{eq:probability_notation}
     \item $C_G$ -- set of all cliques of graph
-    \item $x_c$ -- configuration of node types, which belongs to clique $c$
-    \item $\psi_{c}$ --
+    \item $x_c$ -- configuration of node types, which belongs to clique $c$ ($x_c$ is subset of $x$)
+    \item $\psi_{c}$ -- non-negative, finite functions, defined on random variables of each clique $c$
 \end{itemize}
 
+\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- we can conclude that \emph{all cliques contain one compound node, and one reaction node}.
 
 \newpage
 
