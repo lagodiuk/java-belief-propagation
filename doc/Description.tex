@@ -158,7 +158,7 @@ Lets represent observed chemical reactions as a graph:
     \item Direction of edge -- reflects role of chemical compound in reaction (\textbf{for reagents}: \emph{direction from compound node -- to reaction node}, and \textbf{for products}: \emph{direction from reaction node -- to compound node})
 \end{itemize}
 
-\noindent For example, lets consider subset of three observed reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose, coefficients does nor matter}:
+\noindent For example, lets consider subset of three observed reactions\footnote{Reactions displayed without balancing coefficients, because for our purpose -- coefficients does nor matter}:
 
 \begin{enumerate}
     \setlength \itemsep{0em}
@@ -219,7 +219,7 @@ Lets represent observed chemical reactions as a graph:
 \noindent To move forward, it is useful to define notation for compound types and reaction types:
 \begin{itemize}
 
-    \item Lets treat each reaction type as element of finite set: $CompoundTypes$. \\
+    \item Lets treat each compound type as entity from finite set: $CompoundTypes$. \\
     For example, $CompoundTypes = \{Base, Water, Acid, Salt\}$
 
     \item Lets treat each reaction type as a tuple with two attributes -- reagents and products. At the same time -- reagents and products will be also represented as a tuples. 
@@ -230,16 +230,16 @@ In general, reaction type \lq \lq$r_1 + r_2 + \cdots + r_n \rightarrow p_1 + p_2
 \begin{equation} \label{eq:reaction_type_notation}
 T = (reagents:(r_1, r_2, \cdots , r_n),\ products:(p_1, p_2, \cdots , p_m))
 \end{equation}
-Where $r_i \in CompoundTypes$ (for all $i$), and $p_j \in CompoundTypes$ (for all $j$). \\
+Where $r_i \in CompoundTypes$ ($\forall i \in [1, n]$), and $p_j \in CompoundTypes$ ($\forall j \in [1, m]$). \\
 So, lets treat all reaction types as finite set of described tuples: $ReactionTypes$.
 
-    \item Imagine, that we have reaction type $T$ (such, that $T \in ReactionTypes$). Lets use following notation for accessing to type of $k$-th reagent of reaction type $T$:
+    \item Imagine, that we have reaction type $T$ (such, that $T \in ReactionTypes$). Lets use following notation for accessing to type of $k$-th reagent of $T$:
 \begin{equation} \label{eq:access_reagent_type_notation}
 r_k = reagent_k(T)
 \end{equation}   
 (where $r_k \in CompoundTypes$) \\
 
-And the same for accessing $n$-th product of reaction $T$:
+And the similar notation for accessing $n$-th product of $T$:
 \begin{equation} \label{eq:access_product_type_notation}
 p_n = product_n(T)
 \end{equation}   
@@ -247,12 +247,12 @@ p_n = product_n(T)
 
 \end{itemize}
 
-\noindent As far as each chemical compound must be of some of compound types -- this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}. In other words, each node of graph associated with \emph{discrete-valued random variable}: $X_i$, which corresponds either to compound type or reaction type: $x_i$ (such, that $x_i \in CompoundTypes$, or $x_i \in ReactionTypes$). This can be represented using notation: $X_i = x_i$. 
+\noindent As far as each chemical compound must be of some of compound types: this means, that each \emph{compound node from graph -- implicitly belongs to some compound type}. The same statement (about implicit correspondence to reaction type) is also true for \emph{reaction nodes}. In other words, \emph{each node of graph associated with discrete-valued random variable}: $X_i$, which corresponds either to compound type or reaction type: $x_i$ ($x_i \in CompoundTypes \cup ReactionTypes$). This can be represented using notation: $X_i = x_i$. 
 
 For example, imagine node of graph, which corresponds to chemical compound $NaOH$, so, the possible affiliation of given compound node to type \lq \lq $Base$\rq \rq, might be denoted as: $X_{NaOH} = Base$.
 \\
 
-In general, we will use following notation for describing of probability of some specific configuration of node types of entire graph: $P(X_1 = x_1, X_2 = x_2, \cdots , X_n = x_n)$. In a little bit more succinct form: 
+In general, we will use following notation for describing probability of some specific configuration of node types of entire graph: $P(X_1 = x_1, X_2 = x_2, \cdots , X_n = x_n)$. In a little bit more succinct form: 
 \begin{equation} \label{eq:probability_notation}
 P(X_1 = x_1, X_2 = x_2, \cdots , X_n = x_n) = P(x_1, x_2, \cdots , x_n) = P(x)
 \end{equation}
@@ -295,7 +295,7 @@ where:
     \item $\psi_{c}$ -- non-negative, finite functions, defined on random variables of each clique $c$
 \end{itemize}
 
-\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- we can conclude that \emph{all cliques contain one compound node, and one reaction node}.
+\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- it is clear that \emph{all cliques contain one compound node, and one reaction node}.
 
 \newpage
 
