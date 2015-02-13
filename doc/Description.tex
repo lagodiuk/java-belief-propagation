@@ -295,7 +295,12 @@ where:
     \item $\psi_{c}$ -- non-negative, finite functions, defined on random variables of each clique $c$
 \end{itemize}
 
-\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- it is clear that \emph{all cliques contain one compound node, and one reaction node}.
+\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- it is clear that \emph{all cliques contain one compound node, and one reaction node}. So, actually, for each clique we have function of 2 random variables (which corresponds to reaction type, and compound type): $\psi_c(x_i, x_j)$, where $x_i \in CompoundTypes$ and $x_j \in ReactionTypes$. So, we can rewrite \emph{joint probability} as:
+
+\begin{equation}
+P(x) = {1 \over Z} \prod_{(i,j) \in A_G} \psi_{c}(x_i, x_j)
+\end{equation}
+where $A_G$ -- is set of tuples $(i,j)$, which represents indices of adjacent nodes of chemical reactions graph.
 
 \newpage
 
