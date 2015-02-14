@@ -277,7 +277,11 @@ We can easily \emph{infer} type of compound $X$:
 So, the type of compound $X$ is $T_1 \cap T_2 = \{Basic\ Oxide\}$.
 \\
 
-\noindent Such property of graph of chemical reactions might be formalized as -- \emph{conditional independence of random variables of non-adjacent nodes}. This means, that graph of chemical reactions is actually can be treated as \emph{\textbf{Markov Random Field}} \cite{wikipedia_mrf}.
+Such property of graph of chemical reactions might be formalized as -- \emph{conditional independence of random variables of non-adjacent nodes}. \\
+
+Additionally -- lets temporarily assume, that all edges of reactions graph are undirected (a bit later, we will introduce this roperty again). \\
+
+This means, that graph of chemical reactions is actually can be treated as \emph{\textbf{Markov Random Field}} \cite{wikipedia_mrf}.
 \\
 
 Using result of Hammersley-Clifford Theorem, we can follow up, that probability distribution of configurations of graph -- can be factorized into positive functions defined on cliques that cover all the nodes and edges (also called a \emph{Gibbs distribution})\cite{hammersley_clifford_proof, wikipedia_hammersley_clifford}:
@@ -297,10 +301,88 @@ where:
 
 \noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- it is clear that \emph{all cliques contain one compound node, and one reaction node}. So, actually, for each clique we have function of 2 random variables (which corresponds to reaction type, and compound type): $\psi_c(x_i, x_j)$, where $x_i \in CompoundTypes$ and $x_j \in ReactionTypes$. So, we can rewrite \emph{joint probability} as:
 
-\begin{equation}
+\begin{equation} \label{eq:pairwise_gibbs_distribution}
 P(x) = {1 \over Z} \prod_{(i,j) \in A_G} \psi_{c}(x_i, x_j)
 \end{equation}
-where $A_G$ -- is set of tuples $(i,j)$, which represents indices of adjacent nodes of chemical reactions graph.
+where $A_G$ -- is set of tuples $(i,j)$, which represents indices of adjacent nodes of chemical reactions graph. \\
+
+As you remember -- we temporarily assumed that all edges of graph are undirected. So, lets return back this property to our graph. It can be done in very easy way -- by introducing different kinds of clique functions: \emph{reagent-reaction} and \emph{reaction-product} functions: $\psi_{reagent}(x_i, x_j)$ and $\psi_{product}(x_m, x_k)$ (where $x_i, x_m \in CompoundTypes$, and $x_j, x_k \in ReactionTypes$)\footnote{The similar trick was described in \cite{fraud_detection}.}. So, actually, we can express joint probability of reactions graph as:
+
+\begin{equation}
+P(x) = {1 \over Z} \left( \prod_{(i,j) \in A_R} \psi_{reagent}(x_i, x_j) \right) \left( \prod_{(i,j) \in A_P} \psi_{product}(x_i, x_j) \right)
+\end{equation}
+where:
+\begin{itemize}
+    \setlength \itemsep{0em}
+    \item $A_R$ -- set of tuples $(i,j)$, which represents indices of nodes of \emph{reagent-reaction} cliques
+    \item $A_P$ -- set of tuples $(i,j)$, which represents indices of nodes of \emph{reaction-product} cliques
+    \item $A_R \cup A_P = A_G$ -- from equation \eqref{eq:pairwise_gibbs_distribution}
+\end{itemize}
+
+Lets extend graph of chemical reactions by explicit adding new kind of nodes, which represents \emph{observed states} of existing nodes: $y_i$
+
+\begin{tikzpicture}[
+    -{Latex[length=3mm]},
+    shorten >=1pt,
+    auto,
+    node distance=2.6cm,
+    thick,
+    compound node/.style={circle,fill=blue!20,minimum width=1.7cm,draw},
+    reaction node/.style={draw,thick,fill=green!20,inner sep=.3cm},
+    observed node/.style={circle,fill=black,inner sep=.2cm, node distance = 1.7cm,outer sep=0}]
+
+  \node[compound node] (NaOH) {$NaOH$};
+  \node[reaction node] (Reaction1) [below right of=NaOH] {$1$};
+  \node[compound node] (H2SO4) [above right of=Reaction1] {$H_{2}SO_{4}$};
+  \node[compound node] (Na2SO4) [below left of=Reaction1] {$Na_{2}SO_{4}$};
+  \node[compound node] (H2O) [below right of=Reaction1] {$H_{2}O$};  
+  \node[reaction node] (Reaction2) [left of=Na2SO4] {$2$};  
+  \node[compound node] (SO3) [above left of=Reaction2] {$SO_{3}$};  
+  \node[reaction node] (Reaction3) [right of=H2SO4] {$3$};  
+  \node[compound node] (Na2O) [below right of=Reaction3] {$Na_{2}O$};
+  
+  \node[observed node] (ObservedNaOH) [below of=NaOH] {};
+  \node[observed node] (ObservedH2SO4) [below of=H2SO4] {};
+  \node[observed node] (ObservedNa2SO4) [below of=Na2SO4] {};
+  \node[observed node] (ObservedH2O) [below right of=H2O] {};
+  \node[observed node] (ObservedNa2O) [below of=Na2O] {};
+  \node[observed node] (ObservedSO3) [below of=SO3] {};
+  \node[observed node] (ObservedReaction1) [below of=Reaction1] {};
+  \node[observed node] (ObservedReaction2) [below left of=Reaction2] {};
+  \node[observed node] (ObservedReaction3) [below of=Reaction3] {};
+
+  \path[-]
+    (NaOH) 
+         edge node[left] {} (Reaction1)
+         edge node[right] {} (Reaction2)
+         edge node[right] {} (ObservedNaOH)
+    (H2SO4) 
+         edge node[right] {} (Reaction1)
+         edge node[right] {} (ObservedH2SO4)
+    (Reaction1) 
+         edge node [right] {} (Na2SO4)
+         edge node [left] {} (H2O)
+         edge node[right] {} (ObservedReaction1)
+    (SO3) 
+         edge node [left] {} (Reaction2)
+         edge node[right] {} (ObservedSO3)
+    (Reaction2) 
+         edge node [left] {} (Na2SO4)
+         edge [bend right = 90] node [right] {} (H2O)
+         edge node[right] {} (ObservedReaction2)
+    (H2O) 
+         edge node [left] {} (Reaction3)
+         edge node[right] {} (ObservedH2O)
+    (Na2O) 
+         edge node [right] {} (Reaction3)
+         edge node[right] {} (ObservedNa2O)
+    (Reaction3) 
+         edge [bend right = 90] node [right] {} (NaOH)
+         edge node[right] {} (ObservedReaction3)
+    (Na2SO4)
+         edge node[right] {} (ObservedNa2SO4);
+
+\end{tikzpicture}
 
 \newpage
 
