@@ -178,7 +178,7 @@ Lets represent observed chemical reactions as a graph:
     node distance=2.6cm,
     thick,
     compound node/.style={circle,fill=blue!20,minimum width=1.7cm,draw},
-    reaction node/.style={draw,thick,fill=green!20,inner sep=.3cm}]
+    reaction node/.style={circle,thick,double distance=0.4mm,fill=green!20,minimum width=0.7cm,draw}]
 
   \node[compound node] (NaOH) {$NaOH$};
   \node[reaction node] (Reaction1) [below right of=NaOH] {$1$};
@@ -279,9 +279,9 @@ So, the type of compound $X$ is $T_1 \cap T_2 = \{Basic\ Oxide\}$.
 
 Such property of graph of chemical reactions might be formalized as -- \emph{conditional independence of random variables of non-adjacent nodes}. \\
 
-Additionally -- lets temporarily assume, that all edges of reactions graph are undirected (a bit later, we will introduce this roperty again). \\
+Additionally -- lets temporarily assume, that all edges of reactions graph are undirected (a bit later, we will introduce this property again). \\
 
-This means, that graph of chemical reactions is actually can be treated as \emph{\textbf{Markov Random Field}} \cite{wikipedia_mrf}.
+Considered properties of graph, leads to understanding that actually reactions graph can be treated as a \emph{\textbf{Markov Random Field}} \cite{wikipedia_mrf}.
 \\
 
 Using result of Hammersley-Clifford Theorem, we can follow up, that probability distribution of configurations of graph -- can be factorized into positive functions defined on cliques that cover all the nodes and edges (also called a \emph{Gibbs distribution})\cite{hammersley_clifford_proof, wikipedia_hammersley_clifford}:
@@ -299,7 +299,7 @@ where:
     \item $\psi_{c}$ -- non-negative, finite functions, defined on random variables of each clique $c$
 \end{itemize}
 
-\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- it is clear that \emph{all cliques contain one compound node, and one reaction node}. So, actually, for each clique we have function of 2 random variables (which corresponds to reaction type, and compound type): $\psi_c(x_i, x_j)$, where $x_i \in CompoundTypes$ and $x_j \in ReactionTypes$. So, we can rewrite \emph{joint probability} as:
+\noindent As far as graph of chemical reactions is bipartite graph -- this mean, that maximum clique size is 2. Taking into account absence of edges between nodes of the same kind -- it is clear that \emph{all cliques contain one reaction node, and one compound node (either reagent, or product)}. So, actually, for each clique we have function of 2 random variables (which corresponds to reaction type, and compound type): $\psi_c(x_i, x_j)$, where $x_i \in CompoundTypes$ and $x_j \in ReactionTypes$. So, we can rewrite \emph{joint probability} as:
 
 \begin{equation} \label{eq:pairwise_gibbs_distribution}
 P(x) = {1 \over Z} \prod_{(i,j) \in A_G} \psi_{c}(x_i, x_j)
@@ -309,17 +309,17 @@ where $A_G$ -- is set of tuples $(i,j)$, which represents indices of adjacent no
 As you remember -- we temporarily assumed that all edges of graph are undirected. So, lets return back this property to our graph. It can be done in very easy way -- by introducing different kinds of clique functions: \emph{reagent-reaction} and \emph{reaction-product} functions: $\psi_{reagent}(x_i, x_j)$ and $\psi_{product}(x_m, x_k)$ (where $x_i, x_m \in CompoundTypes$, and $x_j, x_k \in ReactionTypes$)\footnote{The similar trick was described in \cite{fraud_detection}.}. So, actually, we can express joint probability of reactions graph as:
 
 \begin{equation}
-P(x) = {1 \over Z} \left( \prod_{(i,j) \in A_R} \psi_{reagent}(x_i, x_j) \right) \left( \prod_{(i,j) \in A_P} \psi_{product}(x_i, x_j) \right)
+P(x) = {1 \over Z} \left( \prod_{(i,j) \in A_R} \psi_{reagent}(x_i, x_j) \right) \left( \prod_{(m,k) \in A_P} \psi_{product}(x_m, x_k) \right)
 \end{equation}
 where:
 \begin{itemize}
     \setlength \itemsep{0em}
     \item $A_R$ -- set of tuples $(i,j)$, which represents indices of nodes of \emph{reagent-reaction} cliques
-    \item $A_P$ -- set of tuples $(i,j)$, which represents indices of nodes of \emph{reaction-product} cliques
+    \item $A_P$ -- set of tuples $(m,k)$, which represents indices of nodes of \emph{reaction-product} cliques
     \item $A_R \cup A_P = A_G$ -- from equation \eqref{eq:pairwise_gibbs_distribution}
 \end{itemize}
 
-Lets extend graph of chemical reactions by explicit adding new kind of nodes, which represents \emph{observed states} of existing nodes: $y_i$
+Additionally, lets extend graph of chemical reactions by adding new kind of nodes, which explicitly represents \emph{real states} of existing nodes: $y_i$. Lets call such nodes: \emph{observed state nodes}. So, after this extension -- each \emph{compound node} and each \emph{reaction node} will be connected with its own \emph{observed state node}:
 
 \begin{tikzpicture}[
     -{Latex[length=3mm]},
@@ -328,7 +328,7 @@ Lets extend graph of chemical reactions by explicit adding new kind of nodes, wh
     node distance=2.6cm,
     thick,
     compound node/.style={circle,fill=blue!20,minimum width=1.7cm,draw},
-    reaction node/.style={draw,thick,fill=green!20,inner sep=.3cm},
+    reaction node/.style={circle,thick,double distance=0.4mm,fill=green!20,minimum width=0.7cm,draw},
     observed node/.style={circle,fill=black,inner sep=.2cm, node distance = 1.7cm,outer sep=0}]
 
   \node[compound node] (NaOH) {$NaOH$};
