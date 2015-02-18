@@ -177,8 +177,8 @@ Lets represent observed chemical reactions as a graph:
     auto,
     node distance=2.6cm,
     thick,
-    compound node/.style={circle,fill=blue!20,minimum width=1.7cm,draw},
-    reaction node/.style={circle,thick,double distance=0.4mm,fill=green!20,minimum width=0.7cm,draw}]
+    compound node/.style={circle,fill=white,minimum width=1.7cm,draw},
+    reaction node/.style={circle,thick,double distance=0.4mm,fill=white,minimum width=0.7cm,draw}]
 
   \node[compound node] (NaOH) {$NaOH$};
   \node[reaction node] (Reaction1) [below right of=NaOH] {$1$};
@@ -309,14 +309,16 @@ where $A_G$ -- is set of tuples $(i,j)$, which represents indices of adjacent no
 As you remember -- we temporarily assumed that all edges of graph are undirected. So, lets return back this property to our graph. It can be done in very easy way -- by introducing different kinds of clique functions: \emph{reagent-reaction} and \emph{reaction-product} functions: $\psi_{reagent}(x_i, x_j)$ and $\psi_{product}(x_m, x_k)$ (where $x_i, x_m \in CompoundTypes$, and $x_j, x_k \in ReactionTypes$)\footnote{The similar trick was described in \cite{fraud_detection}.}. So, actually, we can express joint probability of reactions graph as:
 
 \begin{equation}
-P(x) = {1 \over Z} \left( \prod_{(i,j) \in A_R} \psi_{reagent}(x_i, x_j) \right) \left( \prod_{(m,k) \in A_P} \psi_{product}(x_m, x_k) \right)
+P(x) = {1 \over Z} \left( \prod_{(i,j) \in A_R} \psi_{r}(x_i, x_j) \right) \left( \prod_{(m,k) \in A_P} \psi_{p}(x_m, x_k) \right)
 \end{equation}
 where:
 \begin{itemize}
     \setlength \itemsep{0em}
+    \item $\psi_{r}$ -- shortened notation for $\psi_{reagent}$
+    \item $\psi_{p}$ -- shortened notation for $\psi_{product}$
     \item $A_R$ -- set of tuples $(i,j)$, which represents indices of nodes of \emph{reagent-reaction} cliques
     \item $A_P$ -- set of tuples $(m,k)$, which represents indices of nodes of \emph{reaction-product} cliques
-    \item $A_R \cup A_P = A_G$ -- from equation \eqref{eq:pairwise_gibbs_distribution}
+    \item $A_R \cup A_P = A_G$ (where, $A_G$ -- from description of equation \eqref{eq:pairwise_gibbs_distribution})
 \end{itemize}
 
 Additionally, lets extend graph of chemical reactions by adding new kind of nodes, which explicitly represents \emph{real states} of existing nodes: $y_i$. Lets call such nodes: \emph{observed state nodes}. So, after this extension -- each \emph{compound node} and each \emph{reaction node} will be connected with its own \emph{observed state node}:
@@ -325,11 +327,12 @@ Additionally, lets extend graph of chemical reactions by adding new kind of node
     -{Latex[length=3mm]},
     shorten >=1pt,
     auto,
-    node distance=2.6cm,
+    node distance=2.8cm,
     thick,
-    compound node/.style={circle,fill=blue!20,minimum width=1.7cm,draw},
-    reaction node/.style={circle,thick,double distance=0.4mm,fill=green!20,minimum width=0.7cm,draw},
-    observed node/.style={circle,fill=black,inner sep=.2cm, node distance = 1.7cm,outer sep=0}]
+    compound node/.style={circle,fill=white,minimum width=1.7cm,draw},
+    reaction node/.style={circle,thick,double distance=0.4mm,fill=white,minimum width=0.7cm,draw},
+    observed node/.style={circle,draw=black,fill=gray,inner sep=.2cm, node distance = 1.7cm,outer sep=0},
+    factor/.style={densely dashed, draw=black, align=center,fill=white,auto=false,sloped}]
 
   \node[compound node] (NaOH) {$NaOH$};
   \node[reaction node] (Reaction1) [below right of=NaOH] {$1$};
@@ -353,34 +356,34 @@ Additionally, lets extend graph of chemical reactions by adding new kind of node
 
   \path[-]
     (NaOH) 
-         edge node[left] {} (Reaction1)
-         edge node[right] {} (Reaction2)
-         edge node[right] {} (ObservedNaOH)
+         edge node[factor] {\rotatebox{45}{$\psi_r$}} (Reaction1)
+         edge node[factor] {\rotatebox{-45}{$\psi_r$}} (Reaction2)
+         edge node[factor] {} (ObservedNaOH)
     (H2SO4) 
-         edge node[right] {} (Reaction1)
-         edge node[right] {} (ObservedH2SO4)
+         edge node[factor] {\rotatebox{-45}{$\psi_r$}} (Reaction1)
+         edge node[factor] {} (ObservedH2SO4)
     (Reaction1) 
-         edge node [right] {} (Na2SO4)
-         edge node [left] {} (H2O)
-         edge node[right] {} (ObservedReaction1)
+         edge node [factor] {\rotatebox{-45}{$\psi_p$}} (Na2SO4)
+         edge node [factor] {\rotatebox{45}{$\psi_p$}} (H2O)
+         edge node[factor] {} (ObservedReaction1)
     (SO3) 
-         edge node [left] {} (Reaction2)
-         edge node[right] {} (ObservedSO3)
+         edge node [factor] {\rotatebox{45}{$\psi_r$}} (Reaction2)
+         edge node[factor] {} (ObservedSO3)
     (Reaction2) 
-         edge node [left] {} (Na2SO4)
-         edge [bend right = 90] node [right] {} (H2O)
-         edge node[right] {} (ObservedReaction2)
+         edge node [factor] {$\psi_p$} (Na2SO4)
+         edge [bend right = 90] node [factor] {$\psi_p$} (H2O)
+         edge node[factor] {} (ObservedReaction2)
     (H2O) 
-         edge node [left] {} (Reaction3)
-         edge node[right] {} (ObservedH2O)
+         edge node [factor] {\rotatebox{-45}{$\psi_r$}} (Reaction3)
+         edge node[factor] {} (ObservedH2O)
     (Na2O) 
-         edge node [right] {} (Reaction3)
-         edge node[right] {} (ObservedNa2O)
+         edge node [factor] {\rotatebox{45}{$\psi_r$}} (Reaction3)
+         edge node[factor] {} (ObservedNa2O)
     (Reaction3) 
-         edge [bend right = 90] node [right] {} (NaOH)
-         edge node[right] {} (ObservedReaction3)
+         edge [bend right = 90] node [factor] {$\psi_p$} (NaOH)
+         edge node[factor] {} (ObservedReaction3)
     (Na2SO4)
-         edge node[right] {} (ObservedNa2SO4);
+         edge node[factor] {} (ObservedNa2SO4);
 
 \end{tikzpicture}
 
