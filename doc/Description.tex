@@ -27,6 +27,14 @@
   
 \definecolor{Gray}{gray}{0.9}
 
+% Put arrow in the center of the line
+% http://tex.stackexchange.com/questions/39278/tikz-arrowheads-in-the-center
+\usetikzlibrary{decorations.markings}
+\tikzset{->-/.style={decoration={
+  markings,
+  mark= at position #1 with {\arrow{Latex[length=4mm]}}},postaction={decorate}}
+}
+
 \begin{document}
 
 \title{Inference of chemical compound types \\ using graph of chemical reactions}
@@ -172,7 +180,6 @@ Lets represent observed chemical reactions as a graph:
 
 % Might be helpful for the further refactoring: http://www.texample.net/tikz/examples/feature/nodes-and-shapes/
 \begin{tikzpicture}[
-    -{Latex[length=3mm]},
     shorten >=1pt,
     auto,
     node distance=2.6cm,
@@ -192,24 +199,24 @@ Lets represent observed chemical reactions as a graph:
 
   \path[every node/.style={font=\sffamily\small}]
     (NaOH) 
-         edge node[left] {} (Reaction1)
-         edge node[right] {} (Reaction2)
+         edge[->- = .6] (Reaction1)
+         edge[->- = .5] (Reaction2)
     (H2SO4) 
-         edge node[right] {} (Reaction1)
+         edge[->- = .6] (Reaction1)
     (Reaction1) 
-         edge node [right] {} (Na2SO4)
-         edge node [left] {} (H2O)
+         edge[->- = .7] (Na2SO4)
+         edge[->- = .7] (H2O)
     (SO3) 
-         edge node [left] {} (Reaction2)
+         edge[->- = .7] (Reaction2)
     (Reaction2) 
-         edge node [left] {} (Na2SO4)
-         edge [bend right = 90] node [right] {} (H2O)
+         edge[->- = .7] (Na2SO4)
+         edge[->- = .5,bend right = 90] (H2O)
     (H2O) 
-         edge node [left] {} (Reaction3)
+         edge[->- = .5] (Reaction3)
     (Na2O) 
-         edge node [right] {} (Reaction3)
+         edge[->- = .6] (Reaction3)
     (Reaction3) 
-         edge [bend right = 90] node [right] {} (NaOH);
+         edge[->- = .5,bend right = 90] (NaOH);
 \end{tikzpicture}
 
 \newpage
