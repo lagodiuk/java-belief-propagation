@@ -467,10 +467,10 @@ Lets write equation for joint probability of one of possible configurations of r
                 &    &     & X_{H_2O} = Water,\ X_{NaOH} = Base,\ X_{Reaction_1} = T_1,\ X_{Reaction_2} = T_2,\ X_{Reaction_3} = T_3) = \\
                 & = & {1 \over Z} & \times \phi_{NaOH}(Base) \times \phi_{H_2SO_4}(Acid) \times \phi_{Na_2SO_4}(Salt) \times \phi_{H_2O}(Water) \times \phi_{SO_3}(Acidic\ Oxide) \times \\ 
                 &    &                   & \times \phi_{Na_2O}(Basic\ Oxide) \times \phi_{Reaction_1}(T_1) \times \phi_{Reaction_2}(T_2) \times \phi_{Reaction_3}(T_3) \times \\[4pt]
+                &    &                   & \times \psi^{product}_{NaOH-Reaction_3}(Base,\ T_3) \times \psi^{reagent}_{Na_2O-Reaction_3}(Basic\ Oxide,\ T_3) \times \\[4pt]
                 &    &                   & \times \psi^{reagent}_{NaOH-Reaction_1}(Base,\ T_1) \times \psi^{reagent}_{H_2SO_4-Reaction_1}(Acid,\ T_1) \times  \\[4pt]
                 &    &                   & \times \psi^{product}_{Na_2SO_4-Reaction_1}(Salt,\ T_1) \times \psi^{reagent}_{NaOH-Reaction_2}(Base,\ T_2) \times \\[4pt]
-                &    &                   & \times \psi^{product}_{Na_2SO_4-Reaction_2}(Salt,\ T_2) \times \psi^{product}_{H_2O-Reaction_2}(Water,\ T_2) \times \\[4pt]
-                &    &                   & \times \psi^{product}_{NaOH-Reaction_3}(Base,\ T_3) \times \psi^{reagent}_{Na_2O-Reaction_3}(Basic\ Oxide,\ T_3) \times \\[4pt]
+                &    &                   & \times \psi^{product}_{Na_2SO_4-Reaction_2}(Salt,\ T_2) \times \psi^{product}_{H_2O-Reaction_2}(Water,\ T_2) \times \\[4pt]                
                 &    &                   & \times \psi^{product}_{H_2O-Reaction_1}(Water,\ T_1) \times \psi^{reagent}_{H_2O-Reaction_3}(Water,\ T_3) \times \\[4pt]
                 &    &                   & \times  \psi^{reagent}_{SO_3-Reaction_2}(Acidic\ Oxide,\ T_2) \\
 \end{aligned}
