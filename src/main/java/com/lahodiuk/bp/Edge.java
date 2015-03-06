@@ -79,13 +79,13 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 			int i = 0;
 			for (STATES_OF_NODE_2 stateOfNode2 : this.node2.getStates()) {
 
-				double logProductOfIncomingMessages =
+				double logPriorProbabilityAndProductIncomingMessages =
 						node2StateToLogPriorProbabilityAndProductIncomingMessages.get(stateOfNode2)
 								- this.getLogIncomingMessage(this.node2, stateOfNode2);
 
-				this.bufferForUpdatingMessagesFromNode2[i] = this.node2.getLogPriorProbablility(stateOfNode2)
-						+ this.potential.getLogValue(stateOfNode1, stateOfNode2)
-						+ logProductOfIncomingMessages;
+				this.bufferForUpdatingMessagesFromNode2[i] =
+						this.potential.getLogValue(stateOfNode1, stateOfNode2)
+								+ logPriorProbabilityAndProductIncomingMessages;
 
 				i += 1;
 			}
@@ -104,13 +104,13 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 			int i = 0;
 			for (STATES_OF_NODE_1 stateOfNode1 : this.node1.getStates()) {
 
-				double logProductOfIncomingMessages =
+				double logPriorProbabilityAndProductIncomingMessages =
 						node1StateToLogPriorProbabilityAndProductIncomingMessages.get(stateOfNode1)
 								- this.getLogIncomingMessage(this.node1, stateOfNode1);
 
-				this.bufferForUpdatingMessagesFromNode1[i] = this.node1.getLogPriorProbablility(stateOfNode1)
-						+ this.potential.getLogValue(stateOfNode1, stateOfNode2)
-						+ logProductOfIncomingMessages;
+				this.bufferForUpdatingMessagesFromNode1[i] =
+						this.potential.getLogValue(stateOfNode1, stateOfNode2)
+								+ logPriorProbabilityAndProductIncomingMessages;
 
 				i += 1;
 			}

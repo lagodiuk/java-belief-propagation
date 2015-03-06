@@ -1,6 +1,6 @@
 package com.lahodiuk.bp.example;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
@@ -24,19 +24,32 @@ public class HammingCodeNetworkTest {
 
 						// encoded transmitted without errors
 						int[] transmitted = encoded;
-						assertArrayEquals(encoded, this.inferenceMostProbableCode(transmitted));
 
-						for (int i = 0; i < encoded.length; i++) {
+						int[] decoded = this.inferenceMostProbableCode(transmitted);
+
+						assertEquals(this.payload(encoded, 4), this.payload(decoded, 4));
+
+						for (int flipPosition = 0; flipPosition < encoded.length; flipPosition++) {
 							// transmit encoded bitstring and flip bit in
 							// specific position
-							transmitted = this.transmitAndFlipBit(encoded, i);
+							transmitted = this.transmitAndFlipBit(encoded, flipPosition);
 
-							assertArrayEquals(encoded, this.inferenceMostProbableCode(transmitted));
+							decoded = this.inferenceMostProbableCode(transmitted);
+
+							assertEquals(this.payload(encoded, 4), this.payload(decoded, 4));
 						}
 					}
 				}
 			}
 		}
+	}
+
+	private String payload(int[] arr, int n) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < n; i++) {
+			sb.append(arr[i]);
+		}
+		return sb.toString();
 	}
 
 	public int[] transmitAndFlipBit(int[] encoded, int flippedBitPosition) {

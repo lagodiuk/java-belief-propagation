@@ -44,7 +44,7 @@ public class HammingCodeNetwork {
 		hammingCode.displayPosteriorProbabilities();
 
 		int[] corrected = hammingCode.getMostProbableCode();
-		System.out.println("Corrected: " + Arrays.toString(corrected));
+		System.out.println("Corrected: " + Arrays.asList(corrected[0], corrected[1], corrected[2], corrected[3]));
 	}
 
 	private enum BitNodeState {
@@ -161,16 +161,16 @@ public class HammingCodeNetwork {
 		public double getPriorProbablility(FactorNodeState state) {
 			BitNodeState[] bitStates = state.getBitStates();
 
-			boolean stateIsAllowed = this.stateIsAllowed(bitStates);
+			boolean stateIsAllowed = stateIsAllowed(bitStates);
 
 			if (stateIsAllowed) {
-				return 0.99;
+				return 1;
 			} else {
-				return 0.01;
+				return 1e-10;
 			}
 		}
 
-		public boolean stateIsAllowed(BitNodeState[] bitStates) {
+		public static boolean stateIsAllowed(BitNodeState[] bitStates) {
 			boolean stateIsAllowed = !(bitStates[0].getValue()
 					^ bitStates[1].getValue()
 					^ bitStates[2].getValue()
@@ -189,10 +189,10 @@ public class HammingCodeNetwork {
 
 		@Override
 		public double getValue(BitNodeState bitState, FactorNodeState checkNodeState) {
-			if (checkNodeState.getBitStates()[this.position] == bitState) {
-				return 0.99;
+			if (FactorNode.stateIsAllowed(checkNodeState.getBitStates()) && (checkNodeState.getBitStates()[this.position] == bitState)) {
+				return 1;
 			} else {
-				return 0.01;
+				return 1e-10;
 			}
 		}
 	}
