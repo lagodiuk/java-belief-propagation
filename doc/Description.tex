@@ -50,7 +50,7 @@
 
 \begin{abstract}
 % TODO: refactor
-In this article we will consider representation of information about chemical reactions - from the point of view of graph theory. We will expose some properties of chemical reactions graph in order to infer types of chemical compounds, and do this in polynomial time. And, finally, I would like to provide detailed description of developed programming framework\cite{project_on_github} for approximate inference over pairwise Markov Random Fields, with appliance to such examples as: decoding of Low-density parity-check codes, Coloring of graph, Fraud detection using network effects\cite{fraud_detection}.
+The fact of participation of chemical compound in some specific chemical reaction - might be treated as implicit signal about properties of given chemical compound. So, in this article, I will unify information about multiple chemical reactions in form of graph - for purpose of inference of properties of multiple chemical compounds, using only information about structure of the network and few additional restrictions (it's become possible, based on results of exploration of properties of graph of chemical reactions). And, finally, I would like to provide detailed description of developed programming framework\cite{project_on_github} for approximate inference over pairwise Markov Random Fields.
 \end{abstract}
 
 \section{Problem statement}
@@ -467,12 +467,12 @@ Lets write equation for joint probability of one of possible configurations of r
                 &    &     & X_{H_2O} = Water,\ X_{NaOH} = Base,\ X_{Reaction_1} = T_1,\ X_{Reaction_2} = T_2,\ X_{Reaction_3} = T_3) = \\
                 & = & {1 \over Z} & \times \phi_{NaOH}(Base) \times \phi_{H_2SO_4}(Acid) \times \phi_{Na_2SO_4}(Salt) \times \phi_{H_2O}(Water) \times \phi_{SO_3}(Acidic\ Oxide) \times \\ 
                 &    &                   & \times \phi_{Na_2O}(Basic\ Oxide) \times \phi_{Reaction_1}(T_1) \times \phi_{Reaction_2}(T_2) \times \phi_{Reaction_3}(T_3) \times \\[4pt]
-                &    &                   & \times \psi^{product}_{NaOH-Reaction_3}(Base,\ T_3) \times \psi^{reagent}_{Na_2O-Reaction_3}(Basic\ Oxide,\ T_3) \times \\[4pt]
-                &    &                   & \times \psi^{reagent}_{NaOH-Reaction_1}(Base,\ T_1) \times \psi^{reagent}_{H_2SO_4-Reaction_1}(Acid,\ T_1) \times  \\[4pt]
-                &    &                   & \times \psi^{product}_{Na_2SO_4-Reaction_1}(Salt,\ T_1) \times \psi^{reagent}_{NaOH-Reaction_2}(Base,\ T_2) \times \\[4pt]
-                &    &                   & \times \psi^{product}_{Na_2SO_4-Reaction_2}(Salt,\ T_2) \times \psi^{product}_{H_2O-Reaction_2}(Water,\ T_2) \times \\[4pt]                
-                &    &                   & \times \psi^{product}_{H_2O-Reaction_1}(Water,\ T_1) \times \psi^{reagent}_{H_2O-Reaction_3}(Water,\ T_3) \times \\[4pt]
-                &    &                   & \times  \psi^{reagent}_{SO_3-Reaction_2}(Acidic\ Oxide,\ T_2) \\
+                &    &                   & \times \psi^{product}_{NaOH\ in\ Reaction_3}(Base,\ T_3) \times \psi^{reagent}_{Na_2O\ in\ Reaction_3}(Basic\ Oxide,\ T_3) \times \\[4pt]
+                &    &                   & \times \psi^{reagent}_{NaOH\ in\ Reaction_1}(Base,\ T_1) \times \psi^{reagent}_{H_2SO_4\ in\ Reaction_1}(Acid,\ T_1) \times  \\[4pt]
+                &    &                   & \times \psi^{product}_{Na_2SO_4\ in\ Reaction_1}(Salt,\ T_1) \times \psi^{reagent}_{NaOH\ in\ Reaction_2}(Base,\ T_2) \times \\[4pt]
+                &    &                   & \times \psi^{product}_{Na_2SO_4\ in\ Reaction_2}(Salt,\ T_2) \times \psi^{product}_{H_2O\ in\ Reaction_2}(Water,\ T_2) \times \\[4pt]                
+                &    &                   & \times \psi^{product}_{H_2O\ in\ Reaction_1}(Water,\ T_1) \times \psi^{reagent}_{H_2O\ in\ Reaction_3}(Water,\ T_3) \times \\[4pt]
+                &    &                   & \times  \psi^{reagent}_{SO_3\ in\ Reaction_2}(Acidic\ Oxide,\ T_2) \\
 \end{aligned}
 \end{equation*}
 
