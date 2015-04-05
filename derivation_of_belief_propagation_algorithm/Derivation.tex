@@ -1,0 +1,192 @@
+\documentclass[fleqn,leqno]{article}
+
+% Defining page margins
+\usepackage[top=1in, bottom=1.5in, left=1in, right=1in]{geometry}
+
+\usepackage{mathtools}
+\usepackage{amsmath}
+
+% Pretty printing of references to multiple equations
+\usepackage{cleveref}
+\newcommand{\crefrangeconjunction}{--}
+
+% argmin function
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% http://tex.stackexchange.com/questions/118410/highlight-terms-in-equation-mode
+\usepackage{xcolor}
+\newcommand{\highlight}[1]{\colorbox{green!10}{$\displaystyle#1$}}
+\newcommand{\highlightred}[1]{\colorbox{olive!10}{$\displaystyle#1$}}
+
+\begin{document}
+
+\title{Detailed derivation of Belief Propagation algorithm}
+\author{Yurii Lahodiuk \\ yura.lagodiuk@gmail.com}
+\date{}
+\maketitle
+
+By definition of probability density function:
+\begin{equation} \label{eq:probability_sum}
+\sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) = 1
+\end{equation}
+
+We are interested in marginal probabilities:
+\begin{equation} \label{eq:marginal_probabilities_one_node}
+\begin{split}
+p_i(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \\
+p_j(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \\
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:marginal_probabilities_two_nodes}
+\begin{split}
+p_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n)
+\end{split}
+\end{equation}
+
+Also, the following equalities are obvious (keeping in mind Equation \eqref{eq:probability_sum}):
+\begin{equation} \label{eq:sum_over_states_of_one_node_marginal_probabilities}
+\begin{split}
+\highlightred{ \sum_{x_i} p_i(x_i) } & =  \sum_{ \highlight{ x_i } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+                               & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) \highlightred{ = 1 } \\
+\highlightred{ \sum_{x_j} p_j(x_j) } & = \sum_{ \highlight{ x_j } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+                               & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) \highlightred{ = 1 }
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:sum_over_states_of_two_node_marginal_probabilities}
+\begin{split}
+\highlightred{ \sum_{x_i} \sum_{x_j} p_{i,j}(x_i, x_j) } & = \sum_{ \highlight{ x_i } } \sum_{ \highlight{ x_j } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+                                                           & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) \highlightred{ = 1 } \\
+\end{split}
+\end{equation}
+
+Lets represent single-node marginal probabilities, using two-node marginal probabilities (keeping in mind Equation \eqref{eq:marginal_probabilities_two_nodes}):
+\begin{equation} \label{eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities}
+\begin{split}
+\highlightred{ p_i(x_i) } & = \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) = \\
+             & = \sum_{x_j} \left( \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+             & \highlightred{ = \sum_{x_j} p_{ij}(x_i, x_j) } \\
+\highlightred{ p_j(x_j) } & = \sum_{x_1} \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) = \\
+             & = \sum_{x_i} \left( \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+             & \highlightred{ = \sum_{x_i} p_{ij}(x_i, x_j) }
+\end{split}
+\end{equation}
+
+Result of Hammersley-Clifford Theorem:
+\begin{equation} \label{eq:hammersley_clifford_probability}
+p(x_1, x_2, \dots x_n) = {1 \over Z} \times \left( \prod_{(i, j)} \psi_{ij}(x_i, x_j) \right) \times \left( \prod_{i} \phi_i(x_i) \right) \times \left( \prod_{j} \phi_j(x_j) \right)
+\end{equation}
+
+Boltzmann's Law:
+\begin{equation*}
+p(x_1, x_2, \dots x_n) = {1 \over Z} \times e^{{-E(x_1, x_2, \dots x_n) \over T}}
+\end{equation*}
+
+We can treat $T$ just as a scaling coefficient, and for simplicity lets assume that $T = 1$:
+\begin{equation} \label{eq:boltzmanns_probability_t_1}
+p(x_1, x_2, \dots x_n) = {1 \over Z} \times e^{-E(x_1, x_2, \dots x_n)}
+\end{equation}
+
+From \eqref{eq:hammersley_clifford_probability} and \eqref{eq:boltzmanns_probability_t_1}:
+\begin{equation*}
+e^{-E(x_1, x_2, \dots x_n)} = \left( \prod_{(i, j)} \psi_{ij}(x_i, x_j) \right) \times \left( \prod_{i} \phi_i(x_i) \right) \times \left( \prod_{j} \phi_j(x_j) \right)
+\end{equation*}
+
+So:
+\begin{equation} \label{eq:energy_expression}
+E(x_1, x_2, \dots x_n) = - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) - \left( \sum_{i} ln(\phi_i(x_i)) \right) - \left( \sum_{j} ln(\phi_j(x_j)) \right)
+\end{equation}
+
+Lets, assume that we have function $b(x_1, x_2, \dots x_n)$, which approximates real probability density function $p(x_1, x_2, \dots x_n)$.
+It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities} the same for $b(x_1, x_2, \dots x_n)$.
+
+Lets use Kullback-Leibler divergence for measurement of \lq \lq difference\rq \rq\ between real and approximated functions:
+\begin{equation}
+\begin{split}
+D(b||p) = & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {b(x_1, x_2, \dots x_n) \over p(x_1, x_2, \dots x_n)} \right) } \right) = \\
+            = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( b(x_1, x_2, \dots x_n) \right) } \right) - \\
+             - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( p(x_1, x_2, \dots x_n) \right) } \right)
+\end{split}
+\end{equation}
+
+Lest substitute $p(x_1, x_2, \dots x_n)$ using expression from equation \eqref{eq:boltzmanns_probability_t_1}:
+\begin{equation}
+\begin{split}
+D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
+             - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {1 \over Z} \times e^{-E(x_1, x_2, \dots x_n)} \right) } \right) = \\
+            = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
+             - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ \left( -ln(Z) -E(x_1, x_2, \dots x_n) \right) } \right) = \\
+            = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
+            + & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln(Z) } \right) + \\
+             + & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ E(x_1, x_2, \dots x_n) } \right) \\
+\end{split}
+\end{equation}
+
+As far, as $Z$ is just a constant -- it doesn't depend on $x_1, x_2 \dots x_n$, so we can move $ln(Z)$ out of summations:
+\begin{equation}
+\begin{split}
+D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
+            + & \highlight{ \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \times ln(Z) } + \\
+            + & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) \\
+\end{split}
+\end{equation}
+
+Taking into account equation \eqref{eq:probability_sum}: we can substitute multiplier near $ln(Z)$ -- to $1$:
+\begin{equation}
+\begin{split}
+D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
+            + & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) + \highlight{ ln(Z) }
+\end{split}
+\end{equation}
+
+Lets use following notation:
+\begin{equation}
+\begin{split}
+U(b(x_1,x_2,\dots x_n))  & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) \\
+-H(b(x_1,x_2,\dots x_n)) & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) \\
+G(b(x_1,x_2,\dots x_n))  & = U(b(x_1,x_2,\dots x_n)) - H(b(x_1,x_2,\dots x_n)) \\
+-F(b(x_1,x_2,\dots x_n)) & = -F = ln(Z)
+\end{split}
+\end{equation}
+
+So:
+\begin{equation}
+D(b||p) = G(b(x_1,x_2,\dots x_n)) - F = G(b(x_1,x_2,\dots x_n)) + ln(Z)
+\end{equation}
+
+Let's transform $U(b(x_1,x_2,\dots x_n))$, using expression for energy \eqref{eq:energy_expression}:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) = \\
+= & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) - \left( \sum_{i} ln(\phi_i(x_i)) \right) - \left( \sum_{j} ln(\phi_j(x_j)) \right) \right) \right) = \\
+= & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\ 
+   & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \sum_{i} ln(\phi_{i}(x_i)) \right) \right) - \\ 
+   & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \sum_{j} ln(\phi_{j}(x_j)) \right) \right) = \\
+= & -\left( \sum_{(i, j)} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
+   & -\left( \sum_{j} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right) = \\
+= & -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
+   & -\left( \sum_{j} \sum_{x_j} \sum_{x_1} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right)
+\end{split}
+\end{equation}
+
+As far, as $\psi_{ij}(x_i, x_j)$ -- depends only on $x_i$ and $x_j$, and $\phi_{i}(x_i)$ -- depends only on $x_i$, and $\phi_{j}(x_j)$ -- depends only on $x_j$ -- we could rewrite sums as:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times \left( \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n}  b(x_1, x_2, \dots x_n) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times \left( \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right) - \\
+   & -\left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times \left( \sum_{x_1} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right)
+\end{split}
+\end{equation}
+
+Taking into account \Cref{eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes}: we can substitute summations of probability density functions -- to marginal probabilities:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times b_{ij}(x_i, x_j) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times b_i(x_i) \right) - \left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times b_j(x_j) \right)
+\end{split}
+\end{equation}
+
+\end{document}
