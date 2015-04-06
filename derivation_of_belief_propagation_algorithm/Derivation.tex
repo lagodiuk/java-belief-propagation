@@ -99,7 +99,44 @@ E(x_1, x_2, \dots x_n) = - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) 
 \end{equation}
 
 Lets, assume that we have function $b(x_1, x_2, \dots x_n)$, which approximates real probability density function $p(x_1, x_2, \dots x_n)$.
-It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities} the same for $b(x_1, x_2, \dots x_n)$.
+It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities} the same for $b(x_1, x_2, \dots x_n)$:
+
+\begin{equation} \label{eq:probability_sum_b}
+\sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  b(x_1, x_2, \dots x_n) = 1
+\end{equation}
+
+\begin{equation} \label{eq:marginal_probabilities_one_node_b}
+\begin{split}
+b_i(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \\
+b_j(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \\
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:marginal_probabilities_two_nodes_b}
+\begin{split}
+b_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} b(x_1, x_2, \dots x_n)
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:sum_over_states_of_one_node_marginal_probabilities_b}
+\begin{split}
+\sum_{x_i} b_i(x_i) & = 1 \\
+\sum_{x_j} b_j(x_j) & = 1
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:sum_over_states_of_two_node_marginal_probabilities_b}
+\begin{split}
+\sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) = 1
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b}
+\begin{split}
+b_i(x_i) & = \sum_{x_j} b_{ij}(x_i, x_j) \\
+b_j(x_j) & = \sum_{x_i} b_{ij}(x_i, x_j) \\
+\end{split}
+\end{equation}
 
 Lets use Kullback-Leibler divergence for measurement of \lq \lq difference\rq \rq\ between real and approximated functions:
 \begin{equation}
@@ -132,7 +169,7 @@ D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n
 \end{split}
 \end{equation}
 
-Taking into account equation \eqref{eq:probability_sum}: we can substitute multiplier near $ln(Z)$ -- to $1$:
+Taking into account equation \eqref{eq:probability_sum_b}: we can substitute multiplier near $ln(Z)$ -- to $1$:
 \begin{equation}
 \begin{split}
 D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
@@ -181,7 +218,7 @@ As far, as $\psi_{ij}(x_i, x_j)$ -- depends only on $x_i$ and $x_j$, and $\phi_{
 \end{split}
 \end{equation}
 
-Taking into account \Cref{eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes}: we can substitute summations of probability density functions -- to marginal probabilities:
+Taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability density functions -- to marginal probabilities:
 \begin{equation}
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times b_{ij}(x_i, x_j) \right) - \\
