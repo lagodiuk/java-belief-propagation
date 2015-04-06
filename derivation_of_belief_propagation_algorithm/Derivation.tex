@@ -3,6 +3,9 @@
 % Defining page margins
 \usepackage[top=1in, bottom=1.5in, left=1in, right=1in]{geometry}
 
+% Ability to generate urls
+\usepackage{hyperref}
+
 \usepackage{mathtools}
 \usepackage{amsmath}
 
@@ -74,7 +77,7 @@ Lets represent single-node marginal probabilities, using pairwise marginal proba
 \end{split}
 \end{equation}
 
-Result of Hammersley-Clifford Theorem:
+Hammersley-Clifford Theorem \cite{hammersley_clifford_original, hammersley_clifford_proof, wikipedia_hammersley_clifford} states, that probability distribution of configurations of Markov Random Field can be factorized into product of non-negative functions (\lq \lq potentials\rq \rq) -- defined over maximal cliques of graph:
 \begin{equation} \label{eq:hammersley_clifford_probability}
 p(x_1, x_2, \dots x_n) = {1 \over Z} \times \left( \prod_{(i, j)} \psi_{ij}(x_i, x_j) \right) \times \left( \prod_{i} \phi_i(x_i) \right) \times \left( \prod_{j} \phi_j(x_j) \right)
 \end{equation}
@@ -170,7 +173,7 @@ D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n
 \end{split}
 \end{equation}
 
-Taking into account equation \eqref{eq:probability_sum_b}: we can substitute multiplier near $ln(Z)$ -- to $1$:
+Taking into account equation \eqref{eq:probability_sum_b}, we can substitute multiplier near $ln(Z)$ -- to $1$:
 \begin{equation}
 \begin{split}
 D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
@@ -244,5 +247,30 @@ So, now we can express $ln(\phi_i(x_i))$, $ln(\phi_j(x_j))$ and $ln(\psi_{ij}(x_
 & ln(\psi_{ij}(x_i, x_j)) = -E_{ij}(x_i, x_j) + E_i(x_i) + E_j(x_j)
 \end{split}
 \end{equation}
+
+\begin{thebibliography}{9}
+
+\bibitem{understanding_bp}
+  Jonathan S. Yedidia, William T. Freeman, and Yair Weiss,
+  \emph{Understanding Belief Propagation and its Generalizations},
+  TR2001-22, 
+  November 2001.
+
+\bibitem{hammersley_clifford_original}
+  J. M. Hammersley, P. Clifford,
+  \emph{Markov fields on finite graphs and lattices},
+  \url{http://www.statslab.cam.ac.uk/~grg/books/hammfest/hamm-cliff.pdf},
+  1971.
+
+\bibitem{hammersley_clifford_proof}
+  Samson Cheung,
+  \emph{Proof of Hammersley-Clifford Theorem},
+  \url{http://web.kaist.ac.kr/~kyomin/Fall09MRF/Hammersley-Clifford_Theorem.pdf},
+  February 3, 2008.
+
+\bibitem{wikipedia_hammersley_clifford}
+  \url{http://en.wikipedia.org/wiki/Hammersley-Clifford_theorem}.
+  
+\end{thebibliography}
 
 \end{document}
