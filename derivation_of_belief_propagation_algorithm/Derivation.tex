@@ -20,7 +20,7 @@
 
 \begin{document}
 
-\title{Detailed derivation of Belief Propagation algorithm}
+\title{Detailed derivation of Belief Propagation algorithm \\ on Pairwise Markov Random Fields}
 \author{Yurii Lahodiuk \\ yura.lagodiuk@gmail.com}
 \date{}
 \maketitle
@@ -30,7 +30,7 @@ By definition of probability density function:
 \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) = 1
 \end{equation}
 
-We are interested in marginal probabilities:
+We are interested in \lq \lq single-node\rq \rq\ marginal probabilities:
 \begin{equation} \label{eq:marginal_probabilities_one_node}
 \begin{split}
 p_i(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \\
@@ -38,13 +38,14 @@ p_j(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{
 \end{split}
 \end{equation}
 
+For nodes, which are connected -- we, also interested in \lq \lq pairwise\rq \rq\ marginal probabilities:
 \begin{equation} \label{eq:marginal_probabilities_two_nodes}
 \begin{split}
 p_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n)
 \end{split}
 \end{equation}
 
-Also, the following equalities are obvious (keeping in mind Equation \eqref{eq:probability_sum}):
+Also, the following equalities for marginal probabilities -- are obvious (keeping in mind Equation \eqref{eq:probability_sum}):
 \begin{equation} \label{eq:sum_over_states_of_one_node_marginal_probabilities}
 \begin{split}
 \highlightred{ \sum_{x_i} p_i(x_i) } & =  \sum_{ \highlight{ x_i } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
@@ -56,19 +57,19 @@ Also, the following equalities are obvious (keeping in mind Equation \eqref{eq:p
 
 \begin{equation} \label{eq:sum_over_states_of_two_node_marginal_probabilities}
 \begin{split}
-\highlightred{ \sum_{x_i} \sum_{x_j} p_{i,j}(x_i, x_j) } & = \sum_{ \highlight{ x_i } } \sum_{ \highlight{ x_j } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+\highlightred{ \sum_{x_i} \sum_{x_j} p_{ij}(x_i, x_j) } & = \sum_{ \highlight{ x_i } } \sum_{ \highlight{ x_j } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
                                                            & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) \highlightred{ = 1 } \\
 \end{split}
 \end{equation}
 
-Lets represent single-node marginal probabilities, using two-node marginal probabilities (keeping in mind Equation \eqref{eq:marginal_probabilities_two_nodes}):
+Lets represent single-node marginal probabilities, using pairwise marginal probabilities (keeping in mind Equation \eqref{eq:marginal_probabilities_two_nodes}):
 \begin{equation} \label{eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities}
 \begin{split}
 \highlightred{ p_i(x_i) } & = \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) = \\
-             & = \sum_{x_j} \left( \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+             & = \sum_{\highlight{x_j}} \left( \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{ \highlight{x_{j - 1}} } \sum_{ \highlight{x_{j + 1}} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
              & \highlightred{ = \sum_{x_j} p_{ij}(x_i, x_j) } \\
 \highlightred{ p_j(x_j) } & = \sum_{x_1} \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) = \\
-             & = \sum_{x_i} \left( \sum_{x_1} \cdots \sum_{ x_{i - 1} } \sum_{ x_{i + 1} } \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
+             & = \sum_{\highlight{x_i}} \left( \sum_{x_1} \cdots \sum_{ \highlight{x_{i - 1}} } \sum_{ \highlight{x_{i + 1}} } \cdots \sum_{ x_{j - 1} } \sum_{ x_{j + 1} } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
              & \highlightred{ = \sum_{x_i} p_{ij}(x_i, x_j) }
 \end{split}
 \end{equation}
@@ -223,6 +224,24 @@ Taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_proba
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times b_{ij}(x_i, x_j) \right) - \\
    & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times b_i(x_i) \right) - \left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times b_j(x_j) \right)
+\end{split}
+\end{equation}
+
+Lets introduce following variables (\lq \lq local energies\rq \rq):
+\begin{equation} \label{eq:local_energies}
+\begin{split}
+& E_i(x_i)    = -ln(\phi_i(x_i)) \\
+& E_j(x_j)    = -ln(\phi_j(x_j)) \\
+& E_{ij}(x_i, x_j) = -ln(\psi_{ij}(x_i, x_j)) -ln(\phi_i(x_i)) -ln(\phi_j(x_j))
+\end{split}
+\end{equation}
+
+So, now we can express $ln(\phi_i(x_i))$, $ln(\phi_j(x_j))$ and $ln(\psi_{ij}(x_i, x_j))$ -- using \lq \lq local energies\rq \rq \eqref{eq:local_energies}:
+\begin{equation} \label{eq:ln_potentials_as_local_energies}
+\begin{split}
+& ln(\phi_i(x_i))    = -E_i(x_i) \\
+& ln(\phi_j(x_j))    = -E_j(x_j) \\
+& ln(\psi_{ij}(x_i, x_j)) = -E_{ij}(x_i, x_j) + E_i(x_i) + E_j(x_j)
 \end{split}
 \end{equation}
 
