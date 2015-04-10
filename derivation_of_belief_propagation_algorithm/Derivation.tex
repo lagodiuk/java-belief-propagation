@@ -77,6 +77,14 @@ Lets represent single-node marginal probabilities, using pairwise marginal proba
 \end{split}
 \end{equation}
 
+Lets consider single-node summation over all edges: where $q_i$ -- number of edges, which connected to node $i$ (the same notations is for node $j$ -- $q_j$);
+\begin{equation} \label{eq:single_node_sum_over_edges}
+\begin{split}
+& \sum_{(i,j)} p_i(x_i) = \sum_{i} \left( q_i \times p_i(x_i) \right) \\
+& \sum_{(i,j)} p_j(x_j) = \sum_{j} \left( q_j \times p_j(x_j) \right)
+\end{split}
+\end{equation}
+
 Hammersley-Clifford Theorem \cite{hammersley_clifford_original, hammersley_clifford_proof, wikipedia_hammersley_clifford} states, that probability distribution of configurations of Markov Random Field can be factorized into product of non-negative functions (\lq \lq potentials\rq \rq) -- defined over maximal cliques of graph:
 \begin{equation} \label{eq:hammersley_clifford_probability}
 p(x_1, x_2, \dots x_n) = {1 \over Z} \times \left( \prod_{(i, j)} \psi_{ij}(x_i, x_j) \right) \times \left( \prod_{i} \phi_i(x_i) \right) \times \left( \prod_{j} \phi_j(x_j) \right)
@@ -103,7 +111,7 @@ E(x_1, x_2, \dots x_n) = - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) 
 \end{equation}
 
 Lets, assume that we have function $b(x_1, x_2, \dots x_n)$, which approximates real probability density function $p(x_1, x_2, \dots x_n)$.
-It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities} the same for $b(x_1, x_2, \dots x_n)$:
+It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities,eq:single_node_sum_over_edges} the same for $b(x_1, x_2, \dots x_n)$:
 
 \begin{equation} \label{eq:probability_sum_b}
 \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  b(x_1, x_2, \dots x_n) = 1
@@ -139,6 +147,13 @@ b_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \hi
 \begin{split}
 b_i(x_i) & = \sum_{x_j} b_{ij}(x_i, x_j) \\
 b_j(x_j) & = \sum_{x_i} b_{ij}(x_i, x_j) \\
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:single_node_sum_over_edges_b}
+\begin{split}
+& \sum_{(i,j)} b_i(x_i) = \sum_{i} \left( q_i \times b_i(x_i) \right) \\
+& \sum_{(i,j)} b_j(x_j) = \sum_{j} \left( q_j \times b_j(x_j) \right)
 \end{split}
 \end{equation}
 
@@ -239,12 +254,22 @@ Lets introduce following variables (\lq \lq local energies\rq \rq):
 \end{split}
 \end{equation}
 
-So, now we can express $ln(\phi_i(x_i))$, $ln(\phi_j(x_j))$ and $ln(\psi_{ij}(x_i, x_j))$ -- using \lq \lq local energies\rq \rq \eqref{eq:local_energies}:
+So, now we can express $ln(\phi_i(x_i))$, $ln(\phi_j(x_j))$ and $ln(\psi_{ij}(x_i, x_j))$ -- using \lq \lq local energies\rq \rq\ \eqref{eq:local_energies}:
 \begin{equation} \label{eq:ln_potentials_as_local_energies}
 \begin{split}
 & ln(\phi_i(x_i))    = -E_i(x_i) \\
 & ln(\phi_j(x_j))    = -E_j(x_j) \\
 & ln(\psi_{ij}(x_i, x_j)) = -E_{ij}(x_i, x_j) + E_i(x_i) + E_j(x_j)
+\end{split}
+\end{equation}
+
+Lets transform $U(b(x_1,x_2,\dots x_n))$ using Equation \eqref{eq:ln_potentials_as_local_energies}:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times (-E_{ij}(x_i, x_j) + E_i(x_i) + E_j(x_j)) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} b_i(x_i) \times (-E_i(x_i)) \right) - \left( \sum_{j} \sum_{x_j} b_j(x_j) \times (-E_j(x_j)) \right) = \\
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_i(x_i) \right) - \\
+   & -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_j(x_j) \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right)
 \end{split}
 \end{equation}
 
