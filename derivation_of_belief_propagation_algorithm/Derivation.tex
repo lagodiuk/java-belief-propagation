@@ -77,11 +77,11 @@ Lets represent single-node marginal probabilities, using pairwise marginal proba
 \end{split}
 \end{equation}
 
-Lets consider single-node summation over all edges: where $q_i$ -- number of edges, which connected to node $i$ (the same notations is for node $j$ -- $q_j$);
-\begin{equation} \label{eq:single_node_sum_over_edges}
+Lets consider summation over all edges - of some functions $f_i(x_i)$ and $f_j(x_j)$ (these functions depends only on states of single nodes: $i$ and $j$), also lets denote $q_i$ -- as a number of edges, which connected to node $i$ (\lq \lq degree\rq \rq\ of node $i$), and $q_j$ -- \lq \lq degree\rq \rq\ of node $j$. So, in this case -- we can represent summations over all edges, as summations over nodes, multiplied by node-degrees:
+\begin{equation} \label{eq:sum_over_edges_to_sum_over_nodes}
 \begin{split}
-& \sum_{(i,j)} p_i(x_i) = \sum_{i} \left( q_i \times p_i(x_i) \right) \\
-& \sum_{(i,j)} p_j(x_j) = \sum_{j} \left( q_j \times p_j(x_j) \right)
+& \sum_{(i,j)} f_i(x_i) = \sum_{i} \left( q_i \times f_i(x_i) \right) \\
+& \sum_{(i,j)} f_j(x_j) = \sum_{j} \left( q_j \times f_j(x_j) \right)
 \end{split}
 \end{equation}
 
@@ -111,7 +111,7 @@ E(x_1, x_2, \dots x_n) = - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) 
 \end{equation}
 
 Lets, assume that we have function $b(x_1, x_2, \dots x_n)$, which approximates real probability density function $p(x_1, x_2, \dots x_n)$.
-It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities,eq:single_node_sum_over_edges} the same for $b(x_1, x_2, \dots x_n)$:
+It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities} the same for $b(x_1, x_2, \dots x_n)$:
 
 \begin{equation} \label{eq:probability_sum_b}
 \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  b(x_1, x_2, \dots x_n) = 1
@@ -147,13 +147,6 @@ b_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \hi
 \begin{split}
 b_i(x_i) & = \sum_{x_j} b_{ij}(x_i, x_j) \\
 b_j(x_j) & = \sum_{x_i} b_{ij}(x_i, x_j) \\
-\end{split}
-\end{equation}
-
-\begin{equation} \label{eq:single_node_sum_over_edges_b}
-\begin{split}
-& \sum_{(i,j)} b_i(x_i) = \sum_{i} \left( q_i \times b_i(x_i) \right) \\
-& \sum_{(i,j)} b_j(x_j) = \sum_{j} \left( q_j \times b_j(x_j) \right)
 \end{split}
 \end{equation}
 
@@ -222,26 +215,26 @@ Let's transform $U(b(x_1,x_2,\dots x_n))$, using expression for energy \eqref{eq
 = & -\left( \sum_{(i, j)} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
    & -\left( \sum_{i} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
    & -\left( \sum_{j} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right) = \\
-= & -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
-   & -\left( \sum_{i} \sum_{x_i} \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
-   & -\left( \sum_{j} \sum_{x_j} \sum_{x_1} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right)
+= & -\left( \sum_{(i, j)} \sum_{\highlight{x_i}} \sum_{\highlight{x_j}} \sum_{x_1} \cdots \sum_{\highlight{x_{i-1}}} \sum_{\highlight{x_{i+1}}} \cdots \sum_{\highlight{x_{j-1}}} \sum_{\highlight{x_{j+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{\highlight{x_i}} \sum_{x_1} \cdots \sum_{\highlight{x_{i-1}}} \sum_{\highlight{x_{i+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
+   & -\left( \sum_{j} \sum_{\highlight{x_j}} \sum_{x_1} \cdots \sum_{\highlight{x_{j-1}}} \sum_{\highlight{x_{j+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right)
 \end{split}
 \end{equation}
 
 As far, as $\psi_{ij}(x_i, x_j)$ -- depends only on $x_i$ and $x_j$, and $\phi_{i}(x_i)$ -- depends only on $x_i$, and $\phi_{j}(x_j)$ -- depends only on $x_j$ -- we could rewrite sums as:
 \begin{equation}
 \begin{split}
-   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times \left( \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n}  b(x_1, x_2, \dots x_n) \right) \right) - \\
-   & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times \left( \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right) - \\
-   & -\left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times \left( \sum_{x_1} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right)
+   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times \left( \highlight{\sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n}  b(x_1, x_2, \dots x_n)} \right) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times \left( \highlight{\sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n)} \right) \right) - \\
+   & -\left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times \left( \highlight{\sum_{x_1} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n)} \right) \right)
 \end{split}
 \end{equation}
 
-Taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability density functions -- to marginal probabilities:
+Taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability density function -- to marginal probabilities:
 \begin{equation}
 \begin{split}
-   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times b_{ij}(x_i, x_j) \right) - \\
-   & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times b_i(x_i) \right) - \left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times b_j(x_j) \right)
+   & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times \highlight{b_{ij}(x_i, x_j)} \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} ln(\phi_{i}(x_i)) \times \highlight{b_i(x_i)} \right) - \left( \sum_{j} \sum_{x_j} ln(\phi_{j}(x_j)) \times \highlight{b_j(x_j)} \right)
 \end{split}
 \end{equation}
 
@@ -268,8 +261,45 @@ Lets transform $U(b(x_1,x_2,\dots x_n))$ using Equation \eqref{eq:ln_potentials_
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times (-E_{ij}(x_i, x_j) + E_i(x_i) + E_j(x_j)) \right) - \\
    & -\left( \sum_{i} \sum_{x_i} b_i(x_i) \times (-E_i(x_i)) \right) - \left( \sum_{j} \sum_{x_j} b_j(x_j) \times (-E_j(x_j)) \right) = \\
-   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_i(x_i) \right) - \\
-   & -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_j(x_j) \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right)
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{(i, j)} \sum_{\highlight{x_i}} \sum_{x_j} b_{ij}(x_i, x_j) \times \highlight{E_i(x_i)} \right) - \\
+   & -\left( \sum_{(i, j)} \sum_{\highlight{x_j}} \sum_{x_i} b_{ij}(x_i, x_j) \times \highlight{E_j(x_j)} \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right)
+\end{split}
+\end{equation}
+
+Taking into account that $E_i(x_i)$ is not depends on $x_j$, and $E_j(x_j)$ is not depends on $x_i$ - we can move these multipliers out of corresponding summations:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{(i, j)} \sum_{\highlight{x_i}} \highlight{E_i(x_i)} \times \highlightred{\sum_{x_j} b_{ij}(x_i, x_j)} \right) - \\
+   & -\left( \sum_{(i, j)} \sum_{\highlight{x_j}} \highlight{E_j(x_j)} \times \highlightred{\sum_{x_i} b_{ij}(x_i, x_j)} \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right)
+\end{split}
+\end{equation}
+
+Taking into account \eqref{eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b} -- we can substitute summations over two-node marginal probabilities -- to single-node marginal probabilities:
+
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{(i, j)} \sum_{x_i} E_i(x_i) \times \highlightred{b_i(x_i)} \right) - \\
+   & -\left( \sum_{(i, j)} \sum_{x_j} E_j(x_j) \times \highlightred{b_j(x_j)} \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right)
+\end{split}
+\end{equation}
+
+Finally, we can substitute summations over edges -- to summation over nodes, as described by Equation \eqref{eq:sum_over_edges_to_sum_over_nodes}:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{x_i} \highlight{\sum_{(i, j)} E_i(x_i) \times b_i(x_i)} \right) - \\
+   & -\left( \sum_{x_j} \highlight{\sum_{(i, j)} E_j(x_j) \times b_j(x_j)} \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right) = \\
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \left( \sum_{x_i} \highlight{\sum_{i} q_i \times E_i(x_i) \times b_i(x_i)} \right) - \\
+   & -\left( \sum_{x_j} \highlight{\sum_{j} q_j \times E_j(x_j) \times b_j(x_j)} \right) + \left( \sum_{i} \sum_{x_i} b_i(x_i) \times E_i(x_i) \right) + \left( \sum_{j} \sum_{x_j} b_j(x_j) \times E_j(x_j) \right) = \\
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \\ 
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times E_i(x_i) \times b_i(x_i) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times E_j(x_j) \times b_j(x_j) \right)
+\end{split}
+\end{equation}
+
+So, finally, we derived representation of $U(b(x_1,x_2,\dots x_n))$ in terms of marginal probabilities and \lq \lq local energies\rq \rq\:
+\begin{equation}
+\begin{split}
+   & U(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times E_i(x_i) \times b_i(x_i) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times E_j(x_j) \times b_j(x_j) \right)
 \end{split}
 \end{equation}
 
