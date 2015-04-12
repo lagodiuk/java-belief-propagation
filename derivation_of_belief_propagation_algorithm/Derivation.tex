@@ -190,7 +190,7 @@ D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n
 \end{equation}
 
 Lets use following notation:
-\begin{equation}
+\begin{equation} \label{eq:U_H_G_F}
 \begin{split}
 U(b(x_1,x_2,\dots x_n))  & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) \\
 -H(b(x_1,x_2,\dots x_n)) & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) \\
@@ -256,7 +256,7 @@ So, now we can express $ln(\phi_i(x_i))$, $ln(\phi_j(x_j))$ and $ln(\psi_{ij}(x_
 \end{split}
 \end{equation}
 
-Lets transform $U(b(x_1,x_2,\dots x_n))$ using Equation \eqref{eq:ln_potentials_as_local_energies}:
+Lets transform $U(b(x_1,x_2,\dots x_n))$ using Equations \eqref{eq:ln_potentials_as_local_energies}:
 \begin{equation}
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times (-E_{ij}(x_i, x_j) + E_i(x_i) + E_j(x_j)) \right) - \\
@@ -295,7 +295,7 @@ Finally, we can substitute summations over edges -- to summation over nodes, as 
 \end{split}
 \end{equation}
 
-So, finally, we derived representation of $U(b(x_1,x_2,\dots x_n))$ in terms of marginal probabilities and \lq \lq local energies\rq \rq\:
+So, finally, we derived representation of $U(b(x_1,x_2,\dots x_n))$ in terms of marginal probabilities and \lq \lq local energies\rq \rq:
 \begin{equation}
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \\
@@ -303,28 +303,76 @@ So, finally, we derived representation of $U(b(x_1,x_2,\dots x_n))$ in terms of 
 \end{split}
 \end{equation}
 
-\begin{thebibliography}{9}
+Now, lets transform $-H(b(x_1,x_2,\dots x_n))$ from Equations \eqref{eq:U_H_G_F}:
+\begin{equation} \label{eq:entropy_joint_probability}
+-H(b(x_1,x_2,\dots x_n)) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right)
+\end{equation}
+
+Lets introduce additional statement \cite{bethe_free_energy_kikuch_approximations_and_bp} (which can be proven by induction \cite{a_montanari_inference_in_graphical_models}) -- probability distribution can be expressed via marginal probabilities (over max-cliques and single nodes), and node-degrees of graph. For Pairwise Markov Random Field this statement can be formalised as:
+\begin{equation} \label{eq:joint_probability_via_marginals}
+b(x_1, x_2, \dots x_n) = {\prod_{(i, j)} b_{ij}(x_i, x_j) \over \prod_i {b_i(x_i)}^{q_i - 1} \times \prod_j {b_j(x_j)}^{q_j - 1}}
+\end{equation}
+
+So, lets rewrite Equation \eqref{eq:entropy_joint_probability}, keeping in mind Equation \eqref{eq:joint_probability_via_marginals}:
+\begin{equation}
+\begin{split}
+  & -H(b(x_1,x_2,\dots x_n)) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( \highlight{b(x_1, x_2, \dots x_n)} \right) \right) = \\
+  & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( \highlight{{\prod_{(i, j)} b_{ij}(x_i, x_j) \over \prod_i {b_i(x_i)}^{q_i - 1} \times \prod_j {b_j(x_j)}^{q_j - 1}}} \right) \right) = \\
+  & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( \highlight{ ln \left( \prod_{(i, j)} b_{ij}(x_i, x_j) \right) - ln \left( \prod_i {b_i(x_i)}^{q_i - 1} \right) - ln \left( \prod_j {b_j(x_j)}^{q_j - 1} \right)} \right) \right) = \\
+  & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( \highlight{ \left( \sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right) \right) - \left( \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right)} \right) \right) = \\
+  & = \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right) \right) - \\
+  & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right)
+\end{split}
+\end{equation}
+
+\begin{thebibliography}{20}
 
 \bibitem{understanding_bp}
   Jonathan S. Yedidia, William T. Freeman, and Yair Weiss,
   \emph{Understanding Belief Propagation and its Generalizations},
+  Mitsubishi Electric Research Laboratories,
   TR2001-22, 
-  November 2001.
+  November 2001,
+  \url{http://www.merl.com/publications/docs/TR2001-22.pdf}
 
 \bibitem{hammersley_clifford_original}
   J. M. Hammersley, P. Clifford,
   \emph{Markov fields on finite graphs and lattices},
-  \url{http://www.statslab.cam.ac.uk/~grg/books/hammfest/hamm-cliff.pdf},
-  1971.
+  1971,
+  \url{http://www.statslab.cam.ac.uk/~grg/books/hammfest/hamm-cliff.pdf}.
 
 \bibitem{hammersley_clifford_proof}
   Samson Cheung,
   \emph{Proof of Hammersley-Clifford Theorem},
-  \url{http://web.kaist.ac.kr/~kyomin/Fall09MRF/Hammersley-Clifford_Theorem.pdf},
-  February 3, 2008.
+  February 3, 2008,
+  \url{http://web.kaist.ac.kr/~kyomin/Fall09MRF/Hammersley-Clifford_Theorem.pdf}
 
 \bibitem{wikipedia_hammersley_clifford}
-  \url{http://en.wikipedia.org/wiki/Hammersley-Clifford_theorem}.
+  \url{http://en.wikipedia.org/wiki/Hammersley-Clifford_theorem}
+  
+\bibitem{bethe_free_energy_kikuch_approximations_and_bp}
+  Jonathan S. Yedidia, William T. Freeman, and Yair Weiss,
+  \emph{Bethe free energy, Kikuchi approximations, and belief propagation algorithms},
+  Mitsubishi Electric Research Laboratories,
+  TR-2001-16,
+  May 2001,
+  \url{http://www.merl.com/publications/docs/TR2001-16.pdf}
+  
+\bibitem{a_montanari_inference_in_graphical_models}
+  Andrea Montanari,
+  \emph{Lecture Notes for Stat 375 Inference in Graphical Models},
+  Department of Electrical Engineering and Department of Statistics, Stanford University,
+  February 21, 2011,
+  (page 41),
+  \url{http://web.stanford.edu/~montanar/TEACHING/Stat375/handouts/notes_stat375_1.pdf}
+  
+\bibitem{constructing_generalized_bp}
+  Jonathan S. Yedidia, William T. Freeman, and Yair Weiss,
+  \emph{Constructing Free Energy Approximations and Generalized Belief Propagation Algorithms},
+  Mitsubishi Electric Research Laboratories,
+  TR2004-040,
+  May 2004,
+  \url{http://www.merl.com/publications/docs/TR2004-040.pdf}
   
 \end{thebibliography}
 
