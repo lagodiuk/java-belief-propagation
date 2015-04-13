@@ -321,7 +321,40 @@ So, lets rewrite Equation \eqref{eq:entropy_joint_probability}, keeping in mind 
   & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( \highlight{ ln \left( \prod_{(i, j)} b_{ij}(x_i, x_j) \right) - ln \left( \prod_i {b_i(x_i)}^{q_i - 1} \right) - ln \left( \prod_j {b_j(x_j)}^{q_j - 1} \right)} \right) \right) = \\
   & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( \highlight{ \left( \sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right) \right) - \left( \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right)} \right) \right) = \\
   & = \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right) \right) - \\
-  & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right)
+  & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right) = \\
+  & = \left( \sum_{(i, j)} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b_{ij}(x_i, x_j) \right) \right) - \\
+  & -\left( \sum_i \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_j \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left({b_j(x_j)}^{q_j - 1}\right) \right)
+\end{split}
+\end{equation}
+
+Lets rearrange sums, according to dependance of marginal probabilities:
+\begin{equation}
+\begin{split}
+  & -H(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{\highlight{x_i}} \sum_{\highlight{x_j}} \sum_{x_1} \cdots \sum_{\highlight{x_{i-1}}} \sum_{\highlight{x_{i+1}}} \cdots \sum_{\highlight{x_{j-1}}} \sum_{\highlight{x_{j+1}}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ln \left( b_{ij}(x_i, x_j) \right)} \right) - \\
+  & -\left( \sum_i \sum_{\highlight{x_i}} \sum_{x_1} \cdots \sum_{\highlight{x_{i - 1}}} \sum_{\highlight{x_{i + 1}}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ln \left({b_i(x_i)}^{q_i - 1}\right)} \right) - \\ 
+  & -\left( \sum_j \sum_{\highlight{x_j}} \sum_{x_1} \cdots \sum_{\highlight{x_{j - 1}}} \sum_{\highlight{x_{j + 1}}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ln \left({b_j(x_j)}^{q_j - 1}\right)} \right) = \\
+  & = \left( \sum_{(i, j)} \sum_{\highlight{x_i}} \sum_{\highlight{x_j}} \highlight{ln \left( b_{ij}(x_i, x_j) \right)} \times \left( \sum_{x_1} \cdots \sum_{\highlight{x_{i-1}}} \sum_{\highlight{x_{i+1}}} \cdots \sum_{\highlight{x_{j-1}}} \sum_{\highlight{x_{j+1}}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right) - \\
+  & -\left( \sum_i \sum_{\highlight{x_i}} \highlight{ln \left({b_i(x_i)}^{q_i - 1}\right)} \times \left( \sum_{x_1} \cdots \sum_{\highlight{x_{i - 1}}} \sum_{\highlight{x_{i + 1}}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right) - \\
+  & -\left( \sum_j \sum_{\highlight{x_j}} \highlight{ln \left({b_j(x_j)}^{q_j - 1}\right)} \times \left( \sum_{x_1} \cdots \sum_{\highlight{x_{j - 1}}} \sum_{\highlight{x_{j + 1}}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \right)
+\end{split}
+\end{equation}
+
+Again, taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability density function -- to marginal probabilities:
+\begin{equation}
+\begin{split}
+  & -H(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times \left( \highlight{ \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) } \right) \right) - \\
+  & -\left( \sum_i \sum_{x_i} ln \left({b_i(x_i)}^{q_i - 1}\right) \times \left( \highlight{ \sum_{x_1} \cdots \sum_{x_{i - 1}} \sum_{x_{i + 1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) } \right) \right) - \\
+  & -\left( \sum_j \sum_{x_j} ln \left({b_j(x_j)}^{q_j - 1}\right) \times \left( \highlight{ \sum_{x_1} \cdots \sum_{x_{j - 1}} \sum_{x_{j + 1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) } \right) \right) = \\
+  & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times \highlight{ b_{ij}(x_i, x_j) } \right) - \\
+  & -\left( \sum_i \sum_{x_i} ln \left({b_i(x_i)}^{q_i - 1}\right) \times \highlight{ b_i(x_i) } \right) - \left( \sum_j \sum_{x_j} ln \left({b_j(x_j)}^{q_j - 1}\right) \times \highlight{ b_j(x_j) } \right)
+\end{split}
+\end{equation}
+
+So, finally, we can represent $-H(b(x_1,x_2,\dots x_n))$ only in terms of marginal probabilities:
+\begin{equation}
+\begin{split}
+  & -H(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times b_{ij}(x_i, x_j) \right) - \\
+  & -\left( \sum_i \sum_{x_i} (q_i - 1) \times ln(b_i(x_i)) \times b_i(x_i) \right) - \left( \sum_j \sum_{x_j} (q_j - 1) \times ln(b_j(x_j)) \times b_j(x_j) \right)
 \end{split}
 \end{equation}
 
