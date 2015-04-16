@@ -153,7 +153,7 @@ b_j(x_j) & = \sum_{x_i} b_{ij}(x_i, x_j) \\
 Lets use Kullback-Leibler divergence for measurement of \lq \lq difference\rq \rq\ between real and approximated functions:
 \begin{equation}
 \begin{split}
-D(b||p) = & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {b(x_1, x_2, \dots x_n) \over p(x_1, x_2, \dots x_n)} \right) } \right) = \\
+D_{KL}(b||p) = & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {b(x_1, x_2, \dots x_n) \over p(x_1, x_2, \dots x_n)} \right) } \right) = \\
             = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( b(x_1, x_2, \dots x_n) \right) } \right) - \\
              - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( p(x_1, x_2, \dots x_n) \right) } \right)
 \end{split}
@@ -162,7 +162,7 @@ D(b||p) = & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n
 Lest substitute $p(x_1, x_2, \dots x_n)$ using expression from equation \eqref{eq:boltzmanns_probability_t_1}:
 \begin{equation}
 \begin{split}
-D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
+D_{KL}(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
              - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {1 \over Z} \times e^{-E(x_1, x_2, \dots x_n)} \right) } \right) = \\
             = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
              - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ \left( -ln(Z) -E(x_1, x_2, \dots x_n) \right) } \right) = \\
@@ -175,7 +175,7 @@ D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n
 As far, as $Z$ is just a constant -- it doesn't depend on $x_1, x_2 \dots x_n$, so we can move $ln(Z)$ out of summations:
 \begin{equation}
 \begin{split}
-D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
+D_{KL}(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
             + & \highlight{ \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \right) \times ln(Z) } + \\
             + & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) \\
 \end{split}
@@ -184,7 +184,7 @@ D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n
 Taking into account equation \eqref{eq:probability_sum_b}, we can substitute multiplier near $ln(Z)$ -- to $1$:
 \begin{equation}
 \begin{split}
-D(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
+D_{KL}(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
             + & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) + \highlight{ ln(Z) }
 \end{split}
 \end{equation}
@@ -200,8 +200,8 @@ G(b(x_1,x_2,\dots x_n))  & = U(b(x_1,x_2,\dots x_n)) - H(b(x_1,x_2,\dots x_n)) \
 \end{equation}
 
 So:
-\begin{equation}
-D(b||p) = G(b(x_1,x_2,\dots x_n)) - F = G(b(x_1,x_2,\dots x_n)) + ln(Z)
+\begin{equation} \label{eq:kl_divergence_via_U_H_ln_Z}
+D_{KL}(b||p) = G(b(x_1,x_2,\dots x_n)) - F = U(b(x_1,x_2,\dots x_n)) - H(b(x_1,x_2,\dots x_n)) + ln(Z)
 \end{equation}
 
 Let's transform $U(b(x_1,x_2,\dots x_n))$, using expression for energy \eqref{eq:energy_expression}:
@@ -296,7 +296,7 @@ Finally, we can substitute summations over edges -- to summation over nodes, as 
 \end{equation}
 
 So, finally, we derived representation of $U(b(x_1,x_2,\dots x_n))$ in terms of marginal probabilities and \lq \lq local energies\rq \rq:
-\begin{equation}
+\begin{equation} \label{eq:U_in_terms_of_local_marginals_and_energies}
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \\
    & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times E_i(x_i) \times b_i(x_i) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times E_j(x_j) \times b_j(x_j) \right)
@@ -351,10 +351,32 @@ Again, taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:margina
 \end{equation}
 
 So, finally, we can represent $-H(b(x_1,x_2,\dots x_n))$ only in terms of marginal probabilities:
-\begin{equation}
+\begin{equation} \label{eq:H_in_terms_of_local_marginals}
 \begin{split}
   & -H(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times b_{ij}(x_i, x_j) \right) - \\
   & -\left( \sum_i \sum_{x_i} (q_i - 1) \times ln(b_i(x_i)) \times b_i(x_i) \right) - \left( \sum_j \sum_{x_j} (q_j - 1) \times ln(b_j(x_j)) \times b_j(x_j) \right)
+\end{split}
+\end{equation}
+
+Lets represent Kullback-Leibler divergence \eqref{eq:kl_divergence_via_U_H_ln_Z} -- in terms of marginal probabilities and local energies (keeping in mind Equations \eqref{eq:U_in_terms_of_local_marginals_and_energies} and \eqref{eq:H_in_terms_of_local_marginals}):
+\begin{equation}
+\begin{split}
+   & D_{KL}(b||p) = U(b(x_1,x_2,\dots x_n)) - H(b(x_1,x_2,\dots x_n)) + ln(Z) = \\
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times E_i(x_i) \times b_i(x_i) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times E_j(x_j) \times b_j(x_j) \right) + \\
+   & +\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times b_{ij}(x_i, x_j) \right) - \\
+   & -\left( \sum_i \sum_{x_i} (q_i - 1) \times ln(b_i(x_i)) \times b_i(x_i) \right) - \left( \sum_j \sum_{x_j} (q_j - 1) \times ln(b_j(x_j)) \times b_j(x_j) \right) + ln(Z) = \\
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times \left( E_{ij}(x_i, x_j) + ln \left( b_{ij}(x_i, x_j) \right) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times b_i(x_i) \times \left( E_i(x_i) + ln(b_i(x_i)) \right) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times b_j(x_j) \times \left( E_j(x_j) + ln(b_j(x_j)) \right) \right) + ln(Z)
+\end{split}
+\end{equation}
+
+So, again, I would like to pay attention on the fact -- that we avoided potentially exponential amount of operations, during calculation of Kullback-Leibler divergence:
+\begin{equation}
+\begin{split}
+   & D_{KL}(b||p) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( {b(x_1, x_2, \dots x_n) \over p(x_1, x_2, \dots x_n)} \right) \right) = \\
+   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times \left( E_{ij}(x_i, x_j) + ln \left( b_{ij}(x_i, x_j) \right) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times b_i(x_i) \times \left( E_i(x_i) + ln(b_i(x_i)) \right) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times b_j(x_j) \times \left( E_j(x_j) + ln(b_j(x_j)) \right) \right) + ln(Z)
 \end{split}
 \end{equation}
 
