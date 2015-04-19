@@ -382,7 +382,7 @@ So, again, I would like to pay attention on the fact -- that we avoided potentia
 
 So, our goal is to find such values of $b_i(x_i)$, $b_j(x_j)$ and $b_{ij}(x_i,x_j)$ -- which leads to minimal value of $D_{KL}(b||p)$, with respect to conditions, defined by \Cref{eq:sum_over_states_of_one_node_marginal_probabilities_b,eq:sum_over_states_of_two_node_marginal_probabilities_b,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b}. 
 
-Lets use Lagrange multipliers method \cite{wikipedia_lagrange_multipliers} for this purpose. Lets construct lagrangian, according 
+Lets use Lagrange multipliers method \cite{wikipedia_lagrange_multipliers} for this purpose. Lets construct lagrangian, according to restrictions from \Cref{eq:sum_over_states_of_one_node_marginal_probabilities_b,eq:sum_over_states_of_two_node_marginal_probabilities_b,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b}:
 \begin{equation}
 \begin{split}
    & \mathcal{L} = D_{KL}(b||p) + \left( \sum_i \gamma_i \times \left( 1 - \sum_{x_i} b_i(x_i) \right) \right) + \left( \sum_j \gamma_j \times \left( 1 - \sum_{x_j} b_j(x_j) \right) \right) + \\
@@ -390,18 +390,41 @@ Lets use Lagrange multipliers method \cite{wikipedia_lagrange_multipliers} for t
    & + \left( \sum_j \sum_{x_j} \sum_{i \in N(j)} \lambda_{ij}(x_j) \times \left( b_j(x_j) - \sum_{x_i} b_{ij}(x_i,x_j) \right) \right)
 \end{split}
 \end{equation}
-Where: $\gamma_i$, $\gamma_j$, $\gamma_{ij}$, $\lambda_{ji}(x_i)$ and $\lambda_{ij}(x_j)$ -- lagrange multipliers.
+Where: 
+\begin{itemize}
+  \item 
+    $\gamma_i$, $\gamma_j$, $\gamma_{ij}$, $\lambda_{ji}(x_i)$ and $\lambda_{ij}(x_j)$ -- lagrange multipliers (just some constants)
+  \item
+    $\sum_{j \in N(i)}$ -- sum over node-indices $j$, which are adjacent to node $i$ (\lq \lq neighbours\rq \rq) \\
+    Which means, that $\forall j \in N(i)$ exists edge (which represented by tuple $(i,j)$)
+  \item
+    $\sum_{i \in N(j)}$ -- sum over node-indices $i$, which are adjacent to node $j$ \\
+\end{itemize}
+
+\noindent
+So, $\mathcal{L}$ -- is a function, which depends on variables:
+\begin{itemize}
+  \item
+    $b_i(x_i)$ -- defined $\forall i \in OddNodes$, and $\forall x_i \in StatesOfNode(i)$
+  \item
+    $b_j(x_j)$ -- defined $\forall j \in EvenNodes$, and $\forall x_j \in StatesOfNode(j)$
+  \item
+    $b_{ij}(x_i,x_j)$ -- defined $\forall (i,j) \in Edges$, and $\forall x_i \in StatesOfNode(i)$, and $\forall x_j \in StatesOfNode(j)$ \\
+\end{itemize}
+
+\noindent
+By definition of Lagrange multipliers method, we are interested in stationary points of $\mathcal{L}$:
 
 \begin{equation}
-{\partial \mathcal{L} \over \partial b_i(x_i)} = 0
+{\partial \mathcal{L} \over \partial b_i(x_i)} = 0,\ (\forall i \in OddNodes,\ \forall x_i \in StatesOfNode(i))
 \end{equation}
 
 \begin{equation}
-{\partial \mathcal{L} \over \partial b_j(x_j)} = 0
+{\partial \mathcal{L} \over \partial b_j(x_j)} = 0,\ (\forall j \in EvenNodes,\ \forall x_j \in StatesOfNode(j))
 \end{equation}
 
 \begin{equation}
-{\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} = 0
+{\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} = 0,\ (\forall (i,j) \in Edges,\ \forall x_i \in StatesOfNode(i),\ \forall x_j \in StatesOfNode(j))
 \end{equation}
 
 
