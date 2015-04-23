@@ -372,7 +372,7 @@ Lets represent Kullback-Leibler divergence \eqref{eq:kl_divergence_via_U_H_ln_Z}
 \end{equation}
 
 So, again, I would like to pay attention on the fact -- that we avoided potentially exponential amount of operations, during calculation of Kullback-Leibler divergence:
-\begin{equation}
+\begin{equation} \label{eq:D_KL}
 \begin{split}
    & D_{KL}(b||p) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( {b(x_1, x_2, \dots x_n) \over p(x_1, x_2, \dots x_n)} \right) \right) = \\
    & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times \left( E_{ij}(x_i, x_j) + ln \left( b_{ij}(x_i, x_j) \right) \right) \right) - \\
@@ -383,7 +383,7 @@ So, again, I would like to pay attention on the fact -- that we avoided potentia
 So, our goal is to find such values of $b_i(x_i)$, $b_j(x_j)$ and $b_{ij}(x_i,x_j)$ -- which leads to minimal value of $D_{KL}(b||p)$, with respect to conditions, defined by \Cref{eq:sum_over_states_of_one_node_marginal_probabilities_b,eq:sum_over_states_of_two_node_marginal_probabilities_b,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b}. 
 
 Lets use Lagrange multipliers method \cite{wikipedia_lagrange_multipliers} for this purpose. Lets construct lagrangian, according to restrictions from \Cref{eq:sum_over_states_of_one_node_marginal_probabilities_b,eq:sum_over_states_of_two_node_marginal_probabilities_b,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b}:
-\begin{equation}
+\begin{equation} \label{eq:lagrangian}
 \begin{split}
    & \mathcal{L} = D_{KL}(b||p) + \left( \sum_i \gamma_i \times \left( 1 - \sum_{x_i} b_i(x_i) \right) \right) + \left( \sum_j \gamma_j \times \left( 1 - \sum_{x_j} b_j(x_j) \right) \right) + \\
    & + \left( \sum_{(i,j)} \gamma_{ij} \times \left( 1 - \sum_{x_i} \sum_{x_j} b_{ij}(x_i,x_j) \right) \right) + \left( \sum_i \sum_{x_i} \sum_{j \in N(i)} \lambda_{ji}(x_i) \times \left( b_i(x_i) - \sum_{x_j} b_{ij}(x_i,x_j) \right) \right) + \\
@@ -415,6 +415,10 @@ So, $\mathcal{L}$ -- is a function, which depends on variables:
 \noindent
 By definition of Lagrange multipliers method, we are interested in stationary points of $\mathcal{L}$:
 
+\begin{equation} \label{eq:partial_b_ij}
+{\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} = 0,\ (\forall (i,j) \in Edges,\ \forall x_i \in StatesOfNode(i),\ \forall x_j \in StatesOfNode(j))
+\end{equation}
+
 \begin{equation}
 {\partial \mathcal{L} \over \partial b_i(x_i)} = 0,\ (\forall i \in OddNodes,\ \forall x_i \in StatesOfNode(i))
 \end{equation}
@@ -423,10 +427,31 @@ By definition of Lagrange multipliers method, we are interested in stationary po
 {\partial \mathcal{L} \over \partial b_j(x_j)} = 0,\ (\forall j \in EvenNodes,\ \forall x_j \in StatesOfNode(j))
 \end{equation}
 
+Lets transform Equation \eqref{eq:partial_b_ij}, using Equation \eqref{eq:lagrangian}:
 \begin{equation}
-{\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} = 0,\ (\forall (i,j) \in Edges,\ \forall x_i \in StatesOfNode(i),\ \forall x_j \in StatesOfNode(j))
+\setlength{\jot}{10pt}
+\begin{split}
+   & {\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} =  {\partial \left( D_{KL}(b||p) \right) \over \partial b_{ij}(x_i, x_j)} + {\partial \left( - \highlight{ \gamma_{ij} } \times b_{ij}(x_i,x_j) \right) \over \partial b_{ij}(x_i, x_j)} + \\
+   & + {\partial \left( - \highlightred{ \lambda_{ji}(x_i) } \times b_{ij}(x_i,x_j) \right) \over \partial b_{ij}(x_i, x_j)} + {\partial \left( - \highlightred{ \lambda_{ij}(x_j) } \times b_{ij}(x_i,x_j) \right) \over \partial b_{ij}(x_i, x_j)} = \\
+   & = {\partial \left( D_{KL}(b||p) \right) \over \partial b_{ij}(x_i, x_j)} - \highlight{ \gamma_{ij} } - \highlightred{ \lambda_{ji}(x_i) } - \highlightred{ \lambda_{ij}(x_j) } = 0
+\end{split}
 \end{equation}
 
+For the further transformation of partial derivative -- lets use expression for $D_{KL}(b||p)$ from Equation \eqref{eq:D_KL}:
+\begin{equation} \label{eq:partial_b_ij_transformed}
+\setlength{\jot}{10pt}
+\begin{split}
+   & {\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} = \highlight{ {\partial \left( D_{KL}(b||p) \right) \over \partial b_{ij}(x_i, x_j)} } - \gamma_{ij} - \lambda_{ji}(x_i) - \lambda_{ij}(x_j) = \\
+   & = \highlight{ {\partial \left( b_{ij}(x_i, x_j) \times \left( E_{ij}(x_i, x_j) + ln \left( b_{ij}(x_i, x_j) \right) \right) \right) \over \partial b_{ij}(x_i, x_j)} } - \gamma_{ij} - \lambda_{ji}(x_i) - \lambda_{ij}(x_j) = \\
+   & = \highlight{ E_{ij}(x_i, x_j) } + \highlight{ {\partial \left( b_{ij}(x_i, x_j) \times ln \left( b_{ij}(x_i, x_j) \right) \right) \over \partial b_{ij}(x_i, x_j)} } - \gamma_{ij} - \lambda_{ji}(x_i) - \lambda_{ij}(x_j) = \\
+   & = \highlight{ E_{ij}(x_i, x_j) } + \highlight{ ln \left( b_{ij}(x_i, x_j) \right) } + \highlight{ 1 } - \gamma_{ij} - \lambda_{ji}(x_i) - \lambda_{ij}(x_j) = 0
+\end{split}
+\end{equation}
+
+So, finally, from Equation \eqref{eq:partial_b_ij_transformed} -- we can derive expression for $ln \left( b_{ij}(x_i, x_j) \right)$:
+\begin{equation}
+   ln \left( b_{ij}(x_i, x_j) \right) = \gamma_{ij} + \lambda_{ji}(x_i) + \lambda_{ij}(x_j) - E_{ij}(x_i, x_j) - 1
+\end{equation}
 
 \begin{thebibliography}{20}
 
