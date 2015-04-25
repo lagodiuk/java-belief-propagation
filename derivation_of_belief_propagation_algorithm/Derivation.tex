@@ -8,6 +8,7 @@
 
 \usepackage{mathtools}
 \usepackage{amsmath}
+\usepackage{empheq}
 
 % Pretty printing of references to multiple equations
 \usepackage{cleveref}
@@ -419,7 +420,7 @@ By definition of Lagrange multipliers method, we are interested in stationary po
 {\partial \mathcal{L} \over \partial b_{ij}(x_i,x_j)} = 0,\ (\forall (i,j) \in Edges,\ \forall x_i \in StatesOfNode(i),\ \forall x_j \in StatesOfNode(j))
 \end{equation}
 
-\begin{equation}
+\begin{equation} \label{eq:partial_b_i}
 {\partial \mathcal{L} \over \partial b_i(x_i)} = 0,\ (\forall i \in OddNodes,\ \forall x_i \in StatesOfNode(i))
 \end{equation}
 
@@ -449,9 +450,55 @@ For the further transformation of partial derivative -- lets use expression for 
 \end{equation}
 
 So, finally, from Equation \eqref{eq:partial_b_ij_transformed} -- we can derive expression for $ln \left( b_{ij}(x_i, x_j) \right)$:
-\begin{equation}
+\begin{equation} \label{eq:ln_b_ij}
    ln \left( b_{ij}(x_i, x_j) \right) = \gamma_{ij} + \lambda_{ji}(x_i) + \lambda_{ij}(x_j) - E_{ij}(x_i, x_j) - 1
 \end{equation}
+
+Now, lets transform Equation \eqref{eq:partial_b_i}, using Equation \eqref{eq:lagrangian}:
+
+\begin{equation}
+\setlength{\jot}{10pt}
+\begin{split}
+   & {\partial \mathcal{L} \over \partial b_i(x_i)} = {\partial \left( D_{KL}(b||p) \right) \over \partial b_i(x_i)} + {\partial \left( -\highlight{ \gamma_i } \times b_i(x_i) \right) \over \partial b_i(x_i)} + {\partial \left( \highlightred{ \sum_{j \in N(i)} \lambda_{ji}(x_i) \times b_i(x_i) } \right) \over \partial b_i(x_i)} = \\
+   & = {\partial \left( D_{KL}(b||p) \right) \over \partial b_i(x_i)} -\highlight{ \gamma_i } + \sum_{j \in N(i)} \left( {\partial \left( \highlightred{ \lambda_{ji}(x_i) \times b_i(x_i) } \right) \over \partial b_i(x_i)} \right) = \\
+   & = {\partial \left( D_{KL}(b||p) \right) \over \partial b_i(x_i)} -\highlight{ \gamma_i } + \highlightred{ \sum_{j \in N(i)} \lambda_{ji}(x_i) } = 0
+\end{split}
+\end{equation}
+
+Again, for the further transformation of partial derivative -- lets use expression for $D_{KL}(b||p)$ from Equation \eqref{eq:D_KL}:
+\begin{equation} \label{eq:partial_b_i_transformed}
+\setlength{\jot}{10pt}
+\begin{split}
+   & {\partial \mathcal{L} \over \partial b_i(x_i)} = \highlight{ {\partial \left(- (q_i - 1) \times b_i(x_i) \times \left( E_i(x_i) + ln(b_i(x_i)) \right) \right) \over \partial b_i(x_i)} } -\gamma_i + \sum_{j \in N(i)} \lambda_{ji}(x_i) = \\
+   & = \highlight{-(q_i - 1) \times E_i(x_i)} - \highlight{(q_i - 1) \times {\partial \left( b_i(x_i) \times ln(b_i(x_i)) \right) \over \partial b_i(x_i) } } -\gamma_i + \sum_{j \in N(i)} \lambda_{ji}(x_i) = \\
+   & = \highlight{-(q_i - 1) \times E_i(x_i)} - \highlight{(q_i - 1) \times (1 + ln(b_i(x_i))) } -\gamma_i + \sum_{j \in N(i)} \lambda_{ji}(x_i) = 0
+\end{split}
+\end{equation}
+
+So, finally, from Equation \eqref{eq:partial_b_i_transformed} -- we can derive expression for $ln \left( b_i(x_i) \right)$:
+\begin{equation} \label{eq:ln_b_i}
+\begin{split}
+   & (q_i - 1) \times (1 + ln(b_i(x_i))) = -(q_i - 1) \times E_i(x_i) -\gamma_i + \sum_{j \in N(i)} \lambda_{ji}(x_i) \\
+   & (1 + ln(b_i(x_i))) = -E_i(x_i) - {\gamma_i \over q_i - 1} + {\sum_{j \in N(i)} \lambda_{ji}(x_i) \over q_i - 1} \\
+   & ln(b_i(x_i)) = -E_i(x_i) - {\gamma_i \over q_i - 1} - 1 + {1 \over q_i - 1} \times \sum_{j \in N(i)} \lambda_{ji}(x_i)
+\end{split}
+\end{equation}
+
+In the identical way -- we can derive expression for $ln \left( b_j(x_j) \right)$:
+\begin{equation} \label{eq:ln_b_j}
+   ln(b_j(x_j)) = -E_j(x_j) - {\gamma_j \over q_j - 1} - 1 + {1 \over q_j - 1} \times \sum_{i \in N(j)} \lambda_{ij}(x_j)
+\end{equation}
+
+So, finally, we derived expressions for logarithms of marginal probabilities, which corresponds to stationary points of lagrangian:
+\begin{empheq}[left=\empheqlbrace]{align}
+\setlength{\jot}{10pt}
+\begin{split}
+   & ln \left( b_{ij}(x_i, x_j) \right) = \gamma_{ij} + \lambda_{ji}(x_i) + \lambda_{ij}(x_j) - E_{ij}(x_i, x_j) - 1 \\ \\
+   & ln(b_i(x_i)) = -E_i(x_i) - {\gamma_i \over q_i - 1} - 1 + {1 \over q_i - 1} \times \sum_{j \in N(i)} \lambda_{ji}(x_i) \\ \\
+   & ln(b_j(x_j)) = -E_j(x_j) - {\gamma_j \over q_j - 1} - 1 + {1 \over q_j - 1} \times \sum_{i \in N(j)} \lambda_{ij}(x_j)
+\end{split}
+\end{empheq}
+
 
 \begin{thebibliography}{20}
 
