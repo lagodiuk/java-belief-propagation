@@ -93,17 +93,17 @@ p(x_1, x_2, \dots x_n) = {1 \over Z} \times \left( \prod_{(i, j)} \psi_{ij}(x_i,
 
 Boltzmann's Law:
 \begin{equation*}
-p(x_1, x_2, \dots x_n) = {1 \over Z} \times e^{{-E(x_1, x_2, \dots x_n) \over T}}
+p(x_1, x_2, \dots x_n) = {1 \over Z} \times \exp \left( {-E(x_1, x_2, \dots x_n) \over T} \right)
 \end{equation*}
 
 We can treat $T$ just as a scaling coefficient, and for simplicity lets assume that $T = 1$:
 \begin{equation} \label{eq:boltzmanns_probability_t_1}
-p(x_1, x_2, \dots x_n) = {1 \over Z} \times e^{-E(x_1, x_2, \dots x_n)}
+p(x_1, x_2, \dots x_n) = {1 \over Z} \times \exp \left(-E(x_1, x_2, \dots x_n) \right)
 \end{equation}
 
 From \eqref{eq:hammersley_clifford_probability} and \eqref{eq:boltzmanns_probability_t_1}:
 \begin{equation*}
-e^{-E(x_1, x_2, \dots x_n)} = \left( \prod_{(i, j)} \psi_{ij}(x_i, x_j) \right) \times \left( \prod_{i} \phi_i(x_i) \right) \times \left( \prod_{j} \phi_j(x_j) \right)
+\exp \left(-E(x_1, x_2, \dots x_n) \right) = \left( \prod_{(i, j)} \psi_{ij}(x_i, x_j) \right) \times \left( \prod_{i} \phi_i(x_i) \right) \times \left( \prod_{j} \phi_j(x_j) \right)
 \end{equation*}
 
 So:
@@ -164,7 +164,7 @@ Lest substitute $p(x_1, x_2, \dots x_n)$ using expression from equation \eqref{e
 \begin{equation}
 \begin{split}
 D_{KL}(b||p) = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
-             - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {1 \over Z} \times e^{-E(x_1, x_2, \dots x_n)} \right) } \right) = \\
+             - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ ln \left( {1 \over Z} \times \exp \left(-E(x_1, x_2, \dots x_n) \right) \right) } \right) = \\
             = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) - \\
              - & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ \left( -ln(Z) -E(x_1, x_2, \dots x_n) \right) } \right) = \\
             = & \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b(x_1, x_2, \dots x_n) \right) \right) + \\
@@ -531,12 +531,64 @@ Also, it can be easy shown that:
 \end{equation}
 
 So, finally we can represent logarithms of marginal probabilities as:
-\begin{empheq}[left=\empheqlbrace]{align} \label{eq:ln_marginal_probabilities_with_messages}
+\begin{empheq}[left=\empheqlbrace]{align}
 \setlength{\jot}{10pt}
 \begin{split}
    & ln \left( b_{ij}(x_i, x_j) \right) = -E_{ij}(x_i, x_j) + \gamma_{ij} - 1 + \left( \sum_{k \in N(i) \setminus j} ln \left( m_{k \rightarrow i}(x_i) \right) \right) + \left( \sum_{k \in N(j) \setminus i} ln \left( m_{k \rightarrow j}(x_j) \right) \right) \\ \\
    & ln(b_i(x_i)) = -E_i(x_i) - {\gamma_i \over q_i - 1} - 1 + \sum_{k \in N(i)} ln \left( m_{k \rightarrow i}(x_i) \right) \\ \\
    & ln(b_j(x_j)) = -E_j(x_j) - {\gamma_j \over q_j - 1} - 1 + \sum_{k \in N(j)} ln \left( m_{k \rightarrow j}(x_j) \right)
+\end{split}
+\end{empheq}
+
+Lets substitute local energies ($E_i(x_i)$, $E_j(x_j)$ and $E_{ij}(x_i, x_j)$) -- using Equations \eqref{eq:local_energies}:
+\begin{empheq}[left=\empheqlbrace]{align} \label{eq:ln_marginal_probabilities_with_messages}
+\setlength{\jot}{10pt}
+\begin{split}
+   ln \left( b_{ij}(x_i, x_j) \right) & = ln(\psi_{ij}(x_i, x_j)) + ln(\phi_i(x_i)) + ln(\phi_j(x_j)) + \gamma_{ij} - 1 + \\ 
+                                                & + \left( \sum_{k \in N(i) \setminus j} ln \left( m_{k \rightarrow i}(x_i) \right) \right) + \left( \sum_{k \in N(j) \setminus i} ln \left( m_{k \rightarrow j}(x_j) \right) \right) \\ \\
+    ln(b_i(x_i)) & = ln(\phi_i(x_i)) - {\gamma_i \over q_i - 1} - 1 + \sum_{k \in N(i)} ln \left( m_{k \rightarrow i}(x_i) \right) \\ \\
+    ln(b_j(x_j)) & = ln(\phi_j(x_j)) - {\gamma_j \over q_j - 1} - 1 + \sum_{k \in N(j)} ln \left( m_{k \rightarrow j}(x_j) \right)
+\end{split}
+\end{empheq}
+
+Now, lets exponentiate Equations \eqref{eq:ln_marginal_probabilities_with_messages} -- to get expressions for marginal probabilities:
+\begin{empheq}[left=\empheqlbrace]{align} \label{eq:marginal_probabilities_with_messages}
+\setlength{\jot}{10pt}
+\begin{split}
+   & b_{ij}(x_i, x_j) = \exp \left( \gamma_{ij} - 1 \right) \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \times \phi_i(x_i) \times \psi_{ij}(x_i, x_j) \times \phi_j(x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right) \\ \\
+   & b_i(x_i) = \exp \left( - {\gamma_i \over q_i - 1} - 1 \right) \times \phi_i(x_i) \times \left( \prod_{k \in N(i)} m_{k \rightarrow i}(x_i) \right) \\ \\
+   & b_j(x_j) = \exp \left( - {\gamma_j \over q_j - 1} - 1 \right) \times \phi_j(x_j) \times \left( \prod_{k \in N(j)} m_{k \rightarrow j}(x_j) \right)
+\end{split}
+\end{empheq}
+
+If we look at Equations \eqref{eq:marginal_probabilities_with_messages} -- we can notice, that following multipliers does not depend on states of graph nodes ($x_i$ and $x_j$):
+\begin{empheq}[left=\empheqlbrace]{align}
+\begin{split}
+   & \exp \left( \gamma_{ij} - 1 \right) \neq f(x_i, x_j) \\
+   & \exp \left( - {\gamma_i \over q_i - 1} - 1 \right) \neq f(x_i) \\
+   & \exp \left( - {\gamma_j \over q_j - 1} - 1 \right) \neq f(x_j)
+\end{split}
+\end{empheq}
+
+Lets denote:
+\begin{empheq}[left=\empheqlbrace]{align}
+\begin{split}
+   & Z_{ij} = \exp \left( \gamma_{ij} - 1 \right) \\
+   & Z_i = \exp \left( - {\gamma_i \over q_i - 1} - 1 \right) \\
+   & Z_j = \exp \left( - {\gamma_j \over q_j - 1} - 1 \right)
+\end{split}
+\end{empheq}
+
+So, actually, it means, that given multipliers just corresponds to normalization coefficients (with respect to Equations \eqref{eq:sum_over_states_of_one_node_marginal_probabilities_b} and \eqref{eq:sum_over_states_of_two_node_marginal_probabilities_b}):
+\begin{empheq}[left=\empheqlbrace]{align}
+\setlength{\jot}{10pt}
+\begin{split}
+   b_{ij}(x_i, x_j) & = Z_{ij} \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \times \phi_i(x_i) \times \psi_{ij}(x_i, x_j) \times \phi_j(x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right), \\ 
+                          & \text{where } Z_{ij} \text{ is such that } \sum_{x_i} \sum_{x_j} b_{ij}(x_i,x_j) = 1 \\
+   b_i(x_i)           & = Z_i \times \phi_i(x_i) \times \left( \prod_{k \in N(i)} m_{k \rightarrow i}(x_i) \right), \\
+                          & \text{where } Z_i \text{ is such that } \sum_{x_i} b_i(x_i) = 1 \\
+   b_j(x_j)           & = Z_j \times \phi_j(x_j) \times \left( \prod_{k \in N(j)} m_{k \rightarrow j}(x_j) \right), \\
+                          & \text{where } Z_j \text{ is such that } \sum_{x_j} b_j(x_j) = 1
 \end{split}
 \end{empheq}
 
