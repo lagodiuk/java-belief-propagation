@@ -490,7 +490,7 @@ In the identical way -- we can derive expression for $ln \left( b_j(x_j) \right)
 \end{equation}
 
 So, finally, we derived expressions for logarithms of marginal probabilities, which corresponds to stationary points of lagrangian:
-\begin{empheq}[left=\empheqlbrace]{align}
+\begin{empheq}[left=\empheqlbrace]{align} \label{eq:ln_marginal_probabilities}
 \setlength{\jot}{10pt}
 \begin{split}
    & ln \left( b_{ij}(x_i, x_j) \right) = \gamma_{ij} + \lambda_{ji}(x_i) + \lambda_{ij}(x_j) - E_{ij}(x_i, x_j) - 1 \\ \\
@@ -499,6 +499,46 @@ So, finally, we derived expressions for logarithms of marginal probabilities, wh
 \end{split}
 \end{empheq}
 
+As you remember (from Equation \eqref{eq:lagrangian}): $\gamma_i$, $\gamma_j$, $\gamma_{ij}$, $\lambda_{ji}(x_i)$ and $\lambda_{ij}(x_j)$ -- are just some constants. So, if we find a way to compute these constants we will be able to compute marginal probabilities. \\
+
+Lets represent $\lambda_{ji}(x_i)$ -- as a sum of $(q_i - 1)$ constants:
+\begin{equation} \label{eq:lambda_ji_x_i}
+   \lambda_{ji}(x_i) = \sum_{k \in N(i) \setminus j} ln \left( m_{k \rightarrow i}(x_i) \right)
+\end{equation}
+As far as node $i$ has $q_i$ neighbours, we can imagine, that each constant $ln \left( m_{k \rightarrow i}(x_i) \right)$ -- belongs to edge $(k, i)$ (except edge $(j, i)$). \\
+
+The same is applied to $\lambda_{ij}(x_j)$:
+\begin{equation} \label{eq:lambda_ij_x_j}
+   \lambda_{ij}(x_j) = \sum_{k \in N(j) \setminus i} ln \left( m_{k \rightarrow j}(x_j) \right)
+\end{equation}
+
+Lets rewrite Equations \eqref{eq:ln_marginal_probabilities}, using Equations \eqref{eq:lambda_ji_x_i} and \eqref{eq:lambda_ij_x_j}:
+\begin{empheq}[left=\empheqlbrace]{align}
+\setlength{\jot}{10pt}
+\begin{split}
+   & ln \left( b_{ij}(x_i, x_j) \right) = -E_{ij}(x_i, x_j) + \gamma_{ij} - 1 + \highlight{ \left( \sum_{k \in N(i) \setminus j} ln \left( m_{k \rightarrow i}(x_i) \right) \right) } + \highlightred{ \left( \sum_{k \in N(j) \setminus i} ln \left( m_{k \rightarrow j}(x_j) \right) \right) } \\ \\
+   & ln(b_i(x_i)) = -E_i(x_i) - {\gamma_i \over q_i - 1} - 1 + {1 \over q_i - 1} \times \sum_{j \in N(i)} \highlight{ \left( \sum_{k \in N(i) \setminus j} ln \left( m_{k \rightarrow i}(x_i) \right) \right) } \\ \\
+   & ln(b_j(x_j)) = -E_j(x_j) - {\gamma_j \over q_j - 1} - 1 + {1 \over q_j - 1} \times \sum_{i \in N(j)} \highlightred{ \left( \sum_{k \in N(j) \setminus i} ln \left( m_{k \rightarrow j}(x_j) \right) \right) }
+\end{split}
+\end{empheq}
+
+Also, it can be easy shown that:
+\begin{equation}
+\begin{split}
+   & {1 \over q_i - 1} \times \sum_{j \in N(i)} \sum_{k \in N(i) \setminus j} \equiv \sum_{k \in N(i)} \\
+   & {1 \over q_j - 1} \times \sum_{i \in N(j)} \sum_{k \in N(j) \setminus i} \equiv \sum_{k \in N(j)}
+\end{split}
+\end{equation}
+
+So, finally we can represent logarithms of marginal probabilities as:
+\begin{empheq}[left=\empheqlbrace]{align} \label{eq:ln_marginal_probabilities_with_messages}
+\setlength{\jot}{10pt}
+\begin{split}
+   & ln \left( b_{ij}(x_i, x_j) \right) = -E_{ij}(x_i, x_j) + \gamma_{ij} - 1 + \left( \sum_{k \in N(i) \setminus j} ln \left( m_{k \rightarrow i}(x_i) \right) \right) + \left( \sum_{k \in N(j) \setminus i} ln \left( m_{k \rightarrow j}(x_j) \right) \right) \\ \\
+   & ln(b_i(x_i)) = -E_i(x_i) - {\gamma_i \over q_i - 1} - 1 + \sum_{k \in N(i)} ln \left( m_{k \rightarrow i}(x_i) \right) \\ \\
+   & ln(b_j(x_j)) = -E_j(x_j) - {\gamma_j \over q_j - 1} - 1 + \sum_{k \in N(j)} ln \left( m_{k \rightarrow j}(x_j) \right)
+\end{split}
+\end{empheq}
 
 \begin{thebibliography}{20}
 
@@ -551,6 +591,9 @@ So, finally, we derived expressions for logarithms of marginal probabilities, wh
   
 \bibitem{wikipedia_lagrange_multipliers}
   \url{http://en.wikipedia.org/wiki/Lagrange_multiplier}
+  
+\bibitem{wikipedia_fixed_point_iteration}
+  \url{http://en.wikipedia.org/wiki/Fixed-point_iteration}
   
 \end{thebibliography}
 
