@@ -525,8 +525,8 @@ Lets rewrite Equations \eqref{eq:ln_marginal_probabilities}, using Equations \eq
 Also, it can be easy shown that:
 \begin{equation}
 \begin{split}
-   & {1 \over q_i - 1} \times \sum_{j \in N(i)} \sum_{k \in N(i) \setminus j} \equiv \sum_{k \in N(i)} \\
-   & {1 \over q_j - 1} \times \sum_{i \in N(j)} \sum_{k \in N(j) \setminus i} \equiv \sum_{k \in N(j)}
+   & {1 \over q_i - 1} \times \sum_{j \in N(i)} \sum_{k \in N(i) \setminus j} f(k) \equiv \sum_{k \in N(i)} f(k) \\
+   & {1 \over q_j - 1} \times \sum_{i \in N(j)} \sum_{k \in N(j) \setminus i} f(k) \equiv \sum_{k \in N(j)} f(k)
 \end{split}
 \end{equation}
 
