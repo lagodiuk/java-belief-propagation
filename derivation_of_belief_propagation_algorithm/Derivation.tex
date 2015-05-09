@@ -57,19 +57,20 @@ By definition of probability density function:
 We are interested in \lq \lq single-node\rq \rq\ marginal probabilities:
 \begin{equation} \label{eq:marginal_probabilities_one_node}
 \begin{split}
-p_i(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \\
-p_j(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \\
+   & p_i(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n),\ \ \ \ \ \forall i \in I,\ \ \forall x_i \in S(X_i) \\
+   & p_j(x_i) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n),\ \ \ \ \ \forall j \in J,\ \ \forall x_j \in S(X_j) \\
 \end{split}
 \end{equation}
 
 For nodes, which are connected -- we, also interested in \lq \lq pairwise\rq \rq\ marginal probabilities:
 \begin{equation} \label{eq:marginal_probabilities_two_nodes}
 \begin{split}
-p_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n)
+   & p_{ij}(x_i, x_j) = \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{ \highlight{ x_{j - 1} } } \sum_{ \highlight{ x_{j + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n), \\
+   & \forall (i, j) \in E,\ \ \forall x_i \in S(X_i),\ \ \forall x_j \in S(X_j)
 \end{split}
 \end{equation}
 
-Also, the following equalities for marginal probabilities -- are obvious (keeping in mind Equation \eqref{eq:probability_sum}):
+Keeping in mind Equation \eqref{eq:probability_sum}, lets consider following equalities for marginal probabilities (which will be useful during the further steps of derivation):
 \begin{equation} \label{eq:sum_over_states_of_one_node_marginal_probabilities}
 \begin{split}
 \highlightred{ \sum_{x_i} p_i(x_i) } & =  \sum_{ \highlight{ x_i } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
@@ -101,8 +102,8 @@ Lets represent single-node marginal probabilities, using pairwise marginal proba
 Lets consider summation over all edges - of some functions $f_i(x_i)$ and $f_j(x_j)$ (these functions depends only on states of single nodes: $i$ and $j$), also lets denote $q_i$ -- as a number of edges, which connected to node $i$ (\lq \lq degree\rq \rq\ of node $i$), and $q_j$ -- \lq \lq degree\rq \rq\ of node $j$. So, in this case -- we can represent summations over all edges, as summations over nodes, multiplied by node-degrees:
 \begin{equation} \label{eq:sum_over_edges_to_sum_over_nodes}
 \begin{split}
-& \sum_{(i,j)} f_i(x_i) = \sum_{i} \left( q_i \times f_i(x_i) \right) \\
-& \sum_{(i,j)} f_j(x_j) = \sum_{j} \left( q_j \times f_j(x_j) \right)
+& \sum_{(i,j)} f_i(x_i) \equiv \sum_{i} \left( q_i \times f_i(x_i) \right) \\
+& \sum_{(i,j)} f_j(x_j) \equiv \sum_{j} \left( q_j \times f_j(x_j) \right)
 \end{split}
 \end{equation}
 
@@ -228,17 +229,17 @@ D_{KL}(b||p) = G(b(x_1,x_2,\dots x_n)) - F = U(b(x_1,x_2,\dots x_n)) - H(b(x_1,x
 Let's transform $U(b(x_1,x_2,\dots x_n))$, using expression for energy \eqref{eq:energy_expression}:
 \begin{equation}
 \begin{split}
-   & U(b(x_1,x_2,\dots x_n)) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times E(x_1, x_2, \dots x_n) \right) = \\
-= & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) - \left( \sum_{i} ln(\phi_i(x_i)) \right) - \left( \sum_{j} ln(\phi_j(x_j)) \right) \right) \right) = \\
-= & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\ 
-   & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \sum_{i} ln(\phi_{i}(x_i)) \right) \right) - \\ 
-   & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \sum_{j} ln(\phi_{j}(x_j)) \right) \right) = \\
-= & -\left( \sum_{(i, j)} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
-   & -\left( \sum_{i} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
-   & -\left( \sum_{j} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right) = \\
-= & -\left( \sum_{(i, j)} \sum_{\highlight{x_i}} \sum_{\highlight{x_j}} \sum_{x_1} \cdots \sum_{\highlight{x_{i-1}}} \sum_{\highlight{x_{i+1}}} \cdots \sum_{\highlight{x_{j-1}}} \sum_{\highlight{x_{j+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
-   & -\left( \sum_{i} \sum_{\highlight{x_i}} \sum_{x_1} \cdots \sum_{\highlight{x_{i-1}}} \sum_{\highlight{x_{i+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
-   & -\left( \sum_{j} \sum_{\highlight{x_j}} \sum_{x_1} \cdots \sum_{\highlight{x_{j-1}}} \sum_{\highlight{x_{j+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right)
+   & U(b(x_1,x_2,\dots x_n)) = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{E(x_1, x_2, \dots x_n)} \right) = \\
+= & \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{\left( - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) - \left( \sum_{i} ln(\phi_i(x_i)) \right) - \left( \sum_{j} ln(\phi_j(x_j)) \right) \right)} \right) = \\
+= & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{\sum_{(i, j)} ln(\psi_{ij}(x_i, x_j))} \right) \right) - \\ 
+   & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{\sum_{i} ln(\phi_{i}(x_i))} \right) \right) - \\ 
+   & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{\sum_{j} ln(\phi_{j}(x_j))} \right) \right) = \\
+= & -\left( \highlight{\sum_{(i, j)}} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{ln(\psi_{ij}(x_i, x_j))} \right) \right) - \\
+   & -\left( \highlight{\sum_i} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{ln(\phi_{i}(x_i))} \right) \right) - \\
+   & -\left( \highlight{\sum_j} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \highlight{ln(\phi_{j}(x_j))} \right) \right) = \\
+= & -\left( \sum_{(i, j)} \sum_{\highlightred{x_i}} \sum_{\highlightred{x_j}} \sum_{x_1} \cdots \sum_{\highlightred{x_{i-1}}} \sum_{\highlightred{x_{i+1}}} \cdots \sum_{\highlightred{x_{j-1}}} \sum_{\highlightred{x_{j+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\psi_{ij}(x_i, x_j)) \right) \right) - \\
+   & -\left( \sum_{i} \sum_{\highlightred{x_i}} \sum_{x_1} \cdots \sum_{\highlightred{x_{i-1}}} \sum_{\highlightred{x_{i+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{i}(x_i)) \right) \right) - \\
+   & -\left( \sum_{j} \sum_{\highlightred{x_j}} \sum_{x_1} \cdots \sum_{\highlightred{x_{j-1}}} \sum_{\highlightred{x_{j+1}}} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln(\phi_{j}(x_j)) \right) \right)
 \end{split}
 \end{equation}
 
@@ -612,7 +613,7 @@ So, actually, it means, that given multipliers just corresponds to normalization
 \end{split}
 \end{empheq}
 
-So, if we find a way to calculate appropriate values of $m_{k \rightarrow i}(x_i)$ ($\forall i, \forall k \in N(i), \forall x_i$) and $m_{k \rightarrow j}(x_j)$ ($\forall j, \forall k \in N(j), \forall x_j$) -- we will be able to calculate marginal probabilities $b_i(x_i)$ ($\forall i, \forall x_i$) and $b_j(x_j)$ ($\forall j, \forall x_j$).
+So, if we find a way to calculate appropriate values of $m_{k \rightarrow i}(x_i)$ ($\forall i \in I,\ \ \forall k \in N(i),\ \ \forall x_i \in S(X_i)$) and $m_{k \rightarrow j}(x_j)$ ($\forall j \in J,\ \ \forall k \in N(j),\ \ \forall x_j \in S(X_j)$) -- we will be able to calculate marginal probabilities $b_i(x_i)$ ($\forall i \in I,\ \ \forall x_i \in S(X_i)$) and $b_j(x_j)$ ($\forall j \in J,\ \ \forall x_j \in S(X_j)$).
 
 \begin{thebibliography}{20}
 
