@@ -29,6 +29,26 @@
 \date{}
 \maketitle
 
+Lets consider a graph $G$ -- where cycles are absent (tree). One of the properties of $G$ -- is such, that it is a \emph{bipartite} graph. It means, that there exists 2 disjoint sets of vertices (lets denote them as $I$ and $J$), where edges between vertices of the same set are absent \footnote{Following intuition might be useful: imagine, that we assigned natural numbers: $1, 2, \dots n$ -- for all vertices of $G$. So, we can state that $I$ -- represents set of vertices with \emph{odd} indices, and $J$ -- represents set of vertices with \emph{even} indices.\\}.
+
+The set of edges of graph: $E$ -- can be represented as a set of tuples $(i, j)$, where $i \in I$ and $j \in J$.\\
+
+Also, lets introduce additional property of $G$: each vertex $i \in I$ is associated with some discrete valued random variable $X_i$, which has value $x_i \in S(X_i)$ (where, $S(X_i)$ is a finite set of possible outcomes of random variable $X_i$). 
+
+The same is applicable to all vertices from $J$ -- each vertex $j \in J$ is associated with discrete valued random variable $X_j$, which has value $x_j \in S(X_j)$. \\
+
+Lets introduce shorthand notation for summation of some function $f(x_k)$, which defined $\forall x_k \in S(X_k)$ -- over all outcomes of $X_k$:
+\begin{equation}
+\begin{split}
+   & \sum_{x_k \in S(X_k)} f(x_k) \equiv \sum_{x_k} f(x_k), \ \ \ \ \forall k \in I \cup J
+\end{split}
+\end{equation}
+
+Additionally, lets assume that there exists some probability density function, which represents probabilities of the possible \lq \lq configurations\rq \rq\ of graph \footnote{Concept of \lq \lq configuration\rq \rq\ means: that random variable $X_1$, which associated with vertex $1$, has some specific value $x_1$ -- from the set of possible outcomes: $S(X_1)$; vertex $2$ is associated with random variable $X_2$, which has some specific value $x_2$ -- from the set of possible outcomes $S(X_2)$, and so on.}: $p(X_1=x_1, X_2=x_2, \dots X_n=x_n)$, where $x_1 \in S(X_1),\ x_2 \in S(X_2),\dots x_n \in S(X_n)$. Lets use following shorthand notation for expression of probability density function:
+\begin{equation}
+   p(X_1=x_1, X_2=x_2, \dots X_n=x_n) \equiv p(x_1, x_2, \dots x_n)
+\end{equation}
+
 By definition of probability density function:
 \begin{equation} \label{eq:probability_sum}
 \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) = 1
@@ -321,10 +341,10 @@ So, lets rewrite Equation \eqref{eq:entropy_joint_probability}, keeping in mind 
   & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times ln \left( \highlight{{\prod_{(i, j)} b_{ij}(x_i, x_j) \over \prod_i {b_i(x_i)}^{q_i - 1} \times \prod_j {b_j(x_j)}^{q_j - 1}}} \right) \right) = \\
   & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( \highlight{ ln \left( \prod_{(i, j)} b_{ij}(x_i, x_j) \right) - ln \left( \prod_i {b_i(x_i)}^{q_i - 1} \right) - ln \left( \prod_j {b_j(x_j)}^{q_j - 1} \right)} \right) \right) = \\
   & = \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} \left( b(x_1, x_2, \dots x_n) \times \left( \highlight{ \left( \sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right) \right) - \left( \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right)} \right) \right) = \\
-  & = \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right) \right) - \\
-  & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_i ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \sum_j ln \left({b_j(x_j)}^{q_j - 1}\right) \right) = \\
-  & = \left( \sum_{(i, j)} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left( b_{ij}(x_i, x_j) \right) \right) - \\
-  & -\left( \sum_i \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left({b_i(x_i)}^{q_i - 1}\right) \right) - \left( \sum_j \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times ln \left({b_j(x_j)}^{q_j - 1}\right) \right)
+  & = \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{\sum_{(i, j)} ln \left( b_{ij}(x_i, x_j) \right)} \right) - \\
+  & -\left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlightred{\sum_i ln \left({b_i(x_i)}^{q_i - 1}\right)} \right) - \left( \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlightred{\sum_j ln \left({b_j(x_j)}^{q_j - 1}\right)} \right) = \\
+  & = \left( \highlight{\sum_{(i, j)}} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlight{ln \left( b_{ij}(x_i, x_j) \right)} \right) - \\
+  & -\left( \highlightred{\sum_i} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlightred{ln \left({b_i(x_i)}^{q_i - 1}\right)} \right) - \left( \highlightred{\sum_j} \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) \times \highlightred{ln \left({b_j(x_j)}^{q_j - 1}\right)} \right)
 \end{split}
 \end{equation}
 
@@ -591,6 +611,8 @@ So, actually, it means, that given multipliers just corresponds to normalization
                           & \text{where } Z_j \text{ is such that } \sum_{x_j} b_j(x_j) = 1
 \end{split}
 \end{empheq}
+
+So, if we find a way to calculate appropriate values of $m_{k \rightarrow i}(x_i)$ ($\forall i, \forall k \in N(i), \forall x_i$) and $m_{k \rightarrow j}(x_j)$ ($\forall j, \forall k \in N(j), \forall x_j$) -- we will be able to calculate marginal probabilities $b_i(x_i)$ ($\forall i, \forall x_i$) and $b_j(x_j)$ ($\forall j, \forall x_j$).
 
 \begin{thebibliography}{20}
 
