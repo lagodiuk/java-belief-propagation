@@ -29,6 +29,8 @@
 \date{}
 \maketitle
 
+\section{Problem Statement}
+
 Lets consider a graph $G$ -- where cycles are absent (tree). One of the properties of $G$ -- is such, that it is a \emph{bipartite} graph. It means, that there exists 2 disjoint sets of vertices (lets denote them as $I$ and $J$), where edges between vertices of the same set are absent \footnote{Following intuition might be useful: imagine, that we assigned natural numbers: $1, 2, \dots n$ -- for all vertices of $G$. So, we can state that $I$ -- represents set of vertices with \emph{odd} indices, and $J$ -- represents set of vertices with \emph{even} indices.\\}.
 
 The set of edges of graph: $E$ -- can be represented as a set of tuples $(i, j)$, where $i \in I$ and $j \in J$.\\
@@ -44,12 +46,12 @@ Lets introduce shorthand notation for summation of some function $f(x_k)$, which
 \end{split}
 \end{equation}
 
-Additionally, lets assume that there exists some probability density function, which represents probabilities of the possible \lq \lq configurations\rq \rq\ of graph \footnote{Concept of \lq \lq configuration\rq \rq\ means: that random variable $X_1$, which associated with vertex $1$, has some specific value $x_1$ -- from the set of possible outcomes: $S(X_1)$; vertex $2$ is associated with random variable $X_2$, which has some specific value $x_2$ -- from the set of possible outcomes $S(X_2)$, and so on.}: $p(X_1=x_1, X_2=x_2, \dots X_n=x_n)$, where $x_1 \in S(X_1),\ x_2 \in S(X_2),\dots x_n \in S(X_n)$. Lets use following shorthand notation for expression of probability density function:
+Lets assume that there exists some probability mass function, which represents probabilities of the possible \lq \lq configurations\rq \rq\ of graph \footnote{Concept of \lq \lq configuration\rq \rq\ means: that random variable $X_1$, which associated with vertex $1$, has some specific value $x_1$ -- from the set of possible outcomes: $S(X_1)$; vertex $2$ is associated with random variable $X_2$, which has some specific value $x_2$ -- from the set of possible outcomes $S(X_2)$, and so on.}: $p(X_1=x_1, X_2=x_2, \dots X_n=x_n)$, where $x_1 \in S(X_1),\ x_2 \in S(X_2),\dots x_n \in S(X_n)$. Lets use following shorthand notation for expression of probability mass function:
 \begin{equation}
    p(X_1=x_1, X_2=x_2, \dots X_n=x_n) \equiv p(x_1, x_2, \dots x_n)
 \end{equation}
 
-By definition of probability density function:
+By definition of probability mass function:
 \begin{equation} \label{eq:probability_sum}
 \sum_{x_1} \sum_{x_2} \cdots \sum_{x_n}  p(x_1, x_2, \dots x_n) = 1
 \end{equation}
@@ -70,7 +72,23 @@ For nodes, which are connected -- we, also interested in \lq \lq pairwise\rq \rq
 \end{split}
 \end{equation}
 
-Keeping in mind Equation \eqref{eq:probability_sum}, lets consider following equalities for marginal probabilities (which will be useful during the further steps of derivation):
+Calculation of values of marginal probabilities, by straightforward summations of probability mass function over all possible outcomes of the random variables (except the fixed one) -- leads to exponential complexity of computations:
+\begin{equation}
+\begin{split}
+   & O\left(\ |S(X_1)| \times |S(X_2)| \times \dots \times |S(X_{k-1})| \times |S(X_{k+1})| \times \dots \times |S(X_n)| \ \right) = O(\alpha^{n - 1}) = O(\alpha^n), \\
+   & \forall k \in I \cup J,\\
+   & \text{$\alpha$ -- is just some constant}, \\
+   & \text{$n$ -- is number of vertices in graph $G$}
+\end{split}
+\end{equation}
+
+In case if set of random variables (which associated with vertices of graph $G$) satisfies the local Markov Properties \cite{wikipedia_markov_random_field}, and taking into account bipartiteness of $G$ -- we can state, that given set of random variables is, actually, a \emph{Pairwise Markov Random Field}.
+
+In the following section -- we will expose \emph{local properties} of the Pairwise Markov Random Field, which will help to reduce complexity of computations of the marginal probabilities.
+
+\section{Derivation}
+
+Keeping in mind Equation \eqref{eq:probability_sum}, lets consider following equalities for marginal probabilities \footnote{Described equalities are possible, thanks to commutativity property of summations.} (which will be useful during the further steps of derivation):
 \begin{equation} \label{eq:sum_over_states_of_one_node_marginal_probabilities}
 \begin{split}
 \highlightred{ \sum_{x_i} p_i(x_i) } & =  \sum_{ \highlight{ x_i } } \left( \sum_{x_1} \cdots \sum_{ \highlight{ x_{i - 1} } } \sum_{ \highlight{ x_{i + 1} } } \cdots \sum_{x_n} p(x_1, x_2, \dots x_n) \right) = \\
@@ -99,11 +117,20 @@ Lets represent single-node marginal probabilities, using pairwise marginal proba
 \end{split}
 \end{equation}
 
-Lets consider summation over all edges - of some functions $f_i(x_i)$ and $f_j(x_j)$ (these functions depends only on states of single nodes: $i$ and $j$), also lets denote $q_i$ -- as a number of edges, which connected to node $i$ (\lq \lq degree\rq \rq\ of node $i$), and $q_j$ -- \lq \lq degree\rq \rq\ of node $j$. So, in this case -- we can represent summations over all edges, as summations over nodes, multiplied by node-degrees:
+Lets introduce shorthand notations for summations over vertices (from $I$ and $J$) and edges (from $E$):
+\begin{equation}
+\begin{split}
+   \sum_{i \in I} f(i)         & \equiv \sum_i f(i) \\
+   \sum_{j \in J} f(j)        & \equiv \sum_j f(j) \\
+   \sum_{(i, j) \in E} f(i,j)  & \equiv \sum_{(i,j)} f(i, j)
+\end{split}
+\end{equation}
+
+Lets consider summation over all edges - of some functions $f_i(x_i)$ and $f_j(x_j)$ (which depends only on states of single nodes: $i$ and $j$), also lets denote $q_i$ -- as a number of edges, which connected to node $i$ (\lq \lq degree\rq \rq\ of node $i$), and $q_j$ -- \lq \lq degree\rq \rq\ of node $j$. So, in this case -- we can represent summations over all edges, as summations over nodes, multiplied by node-degrees:
 \begin{equation} \label{eq:sum_over_edges_to_sum_over_nodes}
 \begin{split}
-& \sum_{(i,j)} f_i(x_i) \equiv \sum_{i} \left( q_i \times f_i(x_i) \right) \\
-& \sum_{(i,j)} f_j(x_j) \equiv \sum_{j} \left( q_j \times f_j(x_j) \right)
+   & \sum_{(i,j)} f_i(x_i) \equiv \sum_{i} \left( q_i \times f_i(x_i) \right),\ \ \ \forall i \in I,\ \ \ \forall x_i \in S(X_i) \\
+   & \sum_{(i,j)} f_j(x_j) \equiv \sum_{j} \left( q_j \times f_j(x_j) \right),\ \ \ \forall j \in J,\ \ \ \forall x_j \in S(X_j)
 \end{split}
 \end{equation}
 
@@ -132,7 +159,7 @@ So:
 E(x_1, x_2, \dots x_n) = - \left( \sum_{(i, j)} ln(\psi_{ij}(x_i, x_j)) \right) - \left( \sum_{i} ln(\phi_i(x_i)) \right) - \left( \sum_{j} ln(\phi_j(x_j)) \right)
 \end{equation}
 
-Lets, assume that we have function $b(x_1, x_2, \dots x_n)$, which approximates real probability density function $p(x_1, x_2, \dots x_n)$.
+Lets, assume that we have function $b(x_1, x_2, \dots x_n)$, which approximates real probability mass function $p(x_1, x_2, \dots x_n)$.
 It means, that \Cref{eq:probability_sum,eq:marginal_probabilities_one_node,eq:marginal_probabilities_two_nodes,eq:sum_over_states_of_one_node_marginal_probabilities,eq:sum_over_states_of_two_node_marginal_probabilities,eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities} the same for $b(x_1, x_2, \dots x_n)$:
 
 \begin{equation} \label{eq:probability_sum_b}
@@ -252,7 +279,7 @@ As far, as $\psi_{ij}(x_i, x_j)$ -- depends only on $x_i$ and $x_j$, and $\phi_{
 \end{split}
 \end{equation}
 
-Taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability density function -- to marginal probabilities:
+Taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability mass function -- to marginal probabilities:
 \begin{equation}
 \begin{split}
    & U(b(x_1,x_2,\dots x_n)) = -\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln(\psi_{ij}(x_i, x_j)) \times \highlight{b_{ij}(x_i, x_j)} \right) - \\
@@ -361,7 +388,7 @@ Lets rearrange sums, according to dependance of marginal probabilities:
 \end{split}
 \end{equation}
 
-Again, taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability density function -- to marginal probabilities:
+Again, taking into account \Cref{eq:marginal_probabilities_one_node_b,eq:marginal_probabilities_two_nodes_b}: we can substitute summations of probability mass function -- to marginal probabilities:
 \begin{equation}
 \begin{split}
   & -H(b(x_1,x_2,\dots x_n)) = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times \left( \highlight{ \sum_{x_1} \cdots \sum_{x_{i-1}} \sum_{x_{i+1}} \cdots \sum_{x_{j-1}} \sum_{x_{j+1}} \cdots \sum_{x_n} b(x_1, x_2, \dots x_n) } \right) \right) - \\
@@ -384,12 +411,12 @@ Lets represent Kullback-Leibler divergence \eqref{eq:kl_divergence_via_U_H_ln_Z}
 \begin{equation}
 \begin{split}
    & D_{KL}(b||p) = U(b(x_1,x_2,\dots x_n)) - H(b(x_1,x_2,\dots x_n)) + ln(Z) = \\
-   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right) - \\
-   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times E_i(x_i) \times b_i(x_i) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times E_j(x_j) \times b_j(x_j) \right) + \\
-   & +\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times b_{ij}(x_i, x_j) \right) - \\
-   & -\left( \sum_i \sum_{x_i} (q_i - 1) \times ln(b_i(x_i)) \times b_i(x_i) \right) - \left( \sum_j \sum_{x_j} (q_j - 1) \times ln(b_j(x_j)) \times b_j(x_j) \right) + ln(Z) = \\
-   & = \left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times \left( E_{ij}(x_i, x_j) + ln \left( b_{ij}(x_i, x_j) \right) \right) \right) - \\
-   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times b_i(x_i) \times \left( E_i(x_i) + ln(b_i(x_i)) \right) \right) -\left( \sum_{j} \sum_{x_j} (q_j - 1) \times b_j(x_j) \times \left( E_j(x_j) + ln(b_j(x_j)) \right) \right) + ln(Z)
+   & = \highlight{\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times E_{ij}(x_i, x_j) \right)} - \\
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times E_i(x_i) \times b_i(x_i) \right) -\highlightred{\left( \sum_{j} \sum_{x_j} (q_j - 1) \times E_j(x_j) \times b_j(x_j) \right)} + \\
+   & +\highlight{\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} ln \left( b_{ij}(x_i, x_j) \right) \times b_{ij}(x_i, x_j) \right)} - \\
+   & -\left( \sum_i \sum_{x_i} (q_i - 1) \times ln(b_i(x_i)) \times b_i(x_i) \right) - \highlightred{\left( \sum_j \sum_{x_j} (q_j - 1) \times ln(b_j(x_j)) \times b_j(x_j) \right)} + ln(Z) = \\
+   & = \highlight{\left( \sum_{(i, j)} \sum_{x_i} \sum_{x_j} b_{ij}(x_i, x_j) \times \left( E_{ij}(x_i, x_j) + ln \left( b_{ij}(x_i, x_j) \right) \right) \right)} - \\
+   & -\left( \sum_{i} \sum_{x_i} (q_i - 1) \times b_i(x_i) \times \left( E_i(x_i) + ln(b_i(x_i)) \right) \right) -\highlightred{\left( \sum_{j} \sum_{x_j} (q_j - 1) \times b_j(x_j) \times \left( E_j(x_j) + ln(b_j(x_j)) \right) \right)} + ln(Z)
 \end{split}
 \end{equation}
 
@@ -616,6 +643,9 @@ So, actually, it means, that given multipliers just corresponds to normalization
 So, if we find a way to calculate appropriate values of $m_{k \rightarrow i}(x_i)$ ($\forall i \in I,\ \ \forall k \in N(i),\ \ \forall x_i \in S(X_i)$) and $m_{k \rightarrow j}(x_j)$ ($\forall j \in J,\ \ \forall k \in N(j),\ \ \forall x_j \in S(X_j)$) -- we will be able to calculate marginal probabilities $b_i(x_i)$ ($\forall i \in I,\ \ \forall x_i \in S(X_i)$) and $b_j(x_j)$ ($\forall j \in J,\ \ \forall x_j \in S(X_j)$).
 
 \begin{thebibliography}{20}
+
+\bibitem{wikipedia_markov_random_field}
+  \url{http://en.wikipedia.org/wiki/Markov_random_field}
 
 \bibitem{understanding_bp}
   Jonathan S. Yedidia, William T. Freeman, and Yair Weiss,
