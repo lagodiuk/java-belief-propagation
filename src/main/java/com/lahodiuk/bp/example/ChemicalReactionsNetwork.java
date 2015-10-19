@@ -194,8 +194,8 @@ public class ChemicalReactionsNetwork {
 		}
 
 		public ReactionsNetwork addRuleWithAllowedPermutations(Rule rule) {
-			List<List<CompoundType>> reagentsPermutations = permutations(rule.getReagentTypes());
-			List<List<CompoundType>> productsPermutations = permutations(rule.getProductTypes());
+			Set<List<CompoundType>> reagentsPermutations = permutations(rule.getReagentTypes());
+			Set<List<CompoundType>> productsPermutations = permutations(rule.getProductTypes());
 
 			for (List<CompoundType> reagents : reagentsPermutations) {
 				for (List<CompoundType> products : productsPermutations) {
@@ -217,8 +217,8 @@ public class ChemicalReactionsNetwork {
 			return this;
 		}
 
-		private static <T> List<List<T>> permutations(List<T> seq) {
-			List<List<T>> resultsCollector = new ArrayList<>();
+		private static <T> Set<List<T>> permutations(List<T> seq) {
+			Set<List<T>> resultsCollector = new HashSet<>();
 			permutations(new ArrayList<T>(seq),
 					new LinkedList<>(seq),
 					resultsCollector);
@@ -228,7 +228,7 @@ public class ChemicalReactionsNetwork {
 		private static <T> void permutations(
 				List<T> buffer,
 				List<T> available,
-				List<List<T>> resultsCollector) {
+				Set<List<T>> resultsCollector) {
 
 			if (available.isEmpty()) {
 				// No elements available

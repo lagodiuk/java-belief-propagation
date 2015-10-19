@@ -36,6 +36,10 @@ public class HammingCodeNetworkTest {
 
 							decoded = this.inferenceMostProbableCode(transmitted);
 
+							// TODO: check comment inside method
+							// com.lahodiuk.bp.Node.getPosteriorProbabilities()
+							//
+							// Assert.assertArrayEquals(encoded, decoded);
 							assertEquals(this.payload(encoded, 4), this.payload(decoded, 4));
 						}
 					}

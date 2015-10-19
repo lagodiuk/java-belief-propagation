@@ -22,11 +22,14 @@ import com.lahodiuk.bp.Potential;
  */
 public class ChemicalReactionsNetworkDemo {
 
-	public static final int ITERATIONS_NUMBER = 50;
+	public static final int ITERATIONS_NUMBER = 10;
 
 	public static void main(String[] args) throws Exception {
+		// String path = "src/main/resources/HammingCode.txt";
+		String path = "src/main/resources/ChemicalReactionsNetwork.txt";
+
 		ReactionsNetwork reactionsNetwork = configureReactionsNetwork(
-				Files.readAllLines(Paths.get("src/main/resources/ChemicalReactionsNetwork.txt"), Charset.forName("UTF-8")));
+				Files.readAllLines(Paths.get(path), Charset.forName("UTF-8")));
 
 		inference(reactionsNetwork, ITERATIONS_NUMBER);
 
@@ -39,17 +42,19 @@ public class ChemicalReactionsNetworkDemo {
 
 	private static Rule parseRule(String input) {
 		String[] parts = input.split("=");
-		String reagentsPart = parts[0];
-		String productsPart = parts[1];
 
+		String reagentsPart = parts[0];
 		List<String> reagents = new ArrayList<>();
 		for (String reagent : reagentsPart.split("\\+")) {
 			reagents.add(reagent.trim());
 		}
 
 		List<String> products = new ArrayList<>();
-		for (String product : productsPart.split("\\+")) {
-			products.add(product.trim());
+		if (parts.length > 1) {
+			String productsPart = parts[1];
+			for (String product : productsPart.split("\\+")) {
+				products.add(product.trim());
+			}
 		}
 
 		return new Rule().reagentTypes(reagents).productTypes(products);
@@ -58,7 +63,6 @@ public class ChemicalReactionsNetworkDemo {
 	private static Reaction parseReaction(String input) {
 		String[] parts = input.split("=");
 		String reagentsPart = parts[0];
-		String productsPart = parts[1];
 
 		List<String> reagents = new ArrayList<>();
 		for (String reagent : reagentsPart.split("\\+")) {
@@ -66,8 +70,11 @@ public class ChemicalReactionsNetworkDemo {
 		}
 
 		List<String> products = new ArrayList<>();
-		for (String product : productsPart.split("\\+")) {
-			products.add(product.trim());
+		if (parts.length > 1) {
+			String productsPart = parts[1];
+			for (String product : productsPart.split("\\+")) {
+				products.add(product.trim());
+			}
 		}
 
 		return new Reaction().reagents(reagents).products(products);
@@ -77,7 +84,8 @@ public class ChemicalReactionsNetworkDemo {
 		NOTHING,
 		READING_RULES,
 		READING_COMPOUND_TYPES,
-		READING_REACTIONS;
+		READING_REACTIONS,
+		READING_COMPOUND_TYPES_PROBABILITY
 	}
 
 	public static ReactionsNetwork configureReactionsNetwork(List<String> rawTextLines) {
@@ -92,6 +100,8 @@ public class ChemicalReactionsNetworkDemo {
 				currentState = InputReaderState.READING_RULES;
 			} else if ("#CompoundTypes".equals(s)) {
 				currentState = InputReaderState.READING_COMPOUND_TYPES;
+			} else if ("#CompoundTypesProbability".equals(s)) {
+				currentState = InputReaderState.READING_COMPOUND_TYPES_PROBABILITY;
 			} else if ("#Reactions".equals(s)) {
 				currentState = InputReaderState.READING_REACTIONS;
 			} else if (s.startsWith("#")) {
@@ -114,6 +124,10 @@ public class ChemicalReactionsNetworkDemo {
 					String compound = parts[0].trim();
 					String type = parts[1].trim();
 					reactionsNetwork.setPriorCompoundState(compound, type);
+					break;
+
+				case READING_COMPOUND_TYPES_PROBABILITY:
+					CompoundNode.EPSILON = 1.0 - Double.parseDouble(s);
 					break;
 
 				default:
@@ -190,8 +204,8 @@ public class ChemicalReactionsNetworkDemo {
 		}
 
 		public ReactionsNetwork addRuleWithAllowedPermutations(Rule rule) {
-			List<List<String>> reagentsPermutations = permutations(rule.getReagentTypes());
-			List<List<String>> productsPermutations = permutations(rule.getProductTypes());
+			Set<List<String>> reagentsPermutations = permutations(rule.getReagentTypes());
+			Set<List<String>> productsPermutations = permutations(rule.getProductTypes());
 
 			for (List<String> reagents : reagentsPermutations) {
 				for (List<String> products : productsPermutations) {
@@ -213,8 +227,8 @@ public class ChemicalReactionsNetworkDemo {
 			return this;
 		}
 
-		private static <T> List<List<T>> permutations(List<T> seq) {
-			List<List<T>> resultsCollector = new ArrayList<>();
+		private static <T> Set<List<T>> permutations(List<T> seq) {
+			Set<List<T>> resultsCollector = new HashSet<>();
 			permutations(new ArrayList<T>(seq),
 					new LinkedList<>(seq),
 					resultsCollector);
@@ -224,7 +238,7 @@ public class ChemicalReactionsNetworkDemo {
 		private static <T> void permutations(
 				List<T> buffer,
 				List<T> available,
-				List<List<T>> resultsCollector) {
+				Set<List<T>> resultsCollector) {
 
 			if (available.isEmpty()) {
 				// No elements available
@@ -377,11 +391,17 @@ public class ChemicalReactionsNetworkDemo {
 
 		public void printResults() {
 			for (String compound : this.compoundToCompoundNode.keySet()) {
-				System.out.println(compound + "\t" + this.compoundToCompoundNode.get(compound).getPosteriorProbabilities());
-				System.out.println(compound + "\t" + this.compoundToCompoundNode.get(compound).getMostProbableState() + "\t"
-						+ this.compoundToCompoundNode.get(compound).getPosteriorProbabilities().get(this.compoundToCompoundNode.get(compound).getMostProbableState())
-						+ "\tCount: " + this.compoundToCompoundNode.get(compound).getEdges().size());
-				System.out.println();
+				// System.out.println(compound + "\t" +
+				// this.compoundToCompoundNode.get(compound).getPosteriorProbabilities());
+				System.out.println(compound + "\t" +
+						this.compoundToCompoundNode.get(compound).getMostProbableState()
+						+ "\t"
+						+
+						this.compoundToCompoundNode.get(compound).getPosteriorProbabilities().get(this.compoundToCompoundNode.get(compound).getMostProbableState())
+						+ "\tCount: " +
+						this.compoundToCompoundNode.get(compound).getEdges().size());
+				// System.out.println(compound + "\t" +
+				// this.compoundToCompoundNode.get(compound).getMostProbableState());
 			}
 			System.out.println("Total number of compounds: " + this.compoundToCompoundNode.keySet().size());
 		}
@@ -393,7 +413,7 @@ public class ChemicalReactionsNetworkDemo {
 
 	private static class CompoundNode extends Node<String> {
 
-		private static final double EPSILON = 1e-15;
+		private static double EPSILON = 1e-15;
 
 		private Set<String> states;
 

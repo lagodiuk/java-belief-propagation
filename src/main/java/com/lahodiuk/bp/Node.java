@@ -31,6 +31,21 @@ public abstract class Node<STATES> {
 		TObjectDoubleMap<STATES> stateToLogPriorProbabilityAndProductIncomingMessages =
 				this.getStateToLogPriorProbabilityAndProductIncomingMessages();
 
+		// If we uncomment the following lines of code -
+		// Hamming Code Recovery via Belief Propagation will reconstruct
+		// correctly even parity-check bits. Otherwise - only payload bits are
+		// recovered correctly.
+		// TODO: investigate the reason of this observation.
+		//
+		// for (STATES s :
+		// stateToLogPriorProbabilityAndProductIncomingMessages.keySet()) {
+		// if
+		// (!stateToLogPriorProbabilityAndProductIncomingMessages.adjustValue(s,
+		// -0.3 * this.getLogPriorProbablility(s))) {
+		// throw new RuntimeException();
+		// }
+		// }
+
 		// normalize
 		double sum = Edge.logOfSum(stateToLogPriorProbabilityAndProductIncomingMessages.values());
 		for (STATES state : stateToLogPriorProbabilityAndProductIncomingMessages.keySet()) {

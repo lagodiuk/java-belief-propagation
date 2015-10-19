@@ -1,0 +1,23 @@
+#Rules
+0 + 0 + 0 = 0
+1 + 0 + 0 = 1
+1 + 1 + 0 = 0
+1 + 1 + 1 = 1
+
+#Reactions
+i1 + i2 + i3 = r1
+i2 + i3 + i4 = r2
+i1 + i2 + i4 = r3
+
+#CompoundTypes
+# i1 is flipped (correctly - i1 should be: 1)
+i1 : 0
+i2 : 0
+i3 : 0
+i4 : 1
+r1 : 1
+r2 : 1
+r3 : 0
+
+#CompoundTypesProbability
+0.9
