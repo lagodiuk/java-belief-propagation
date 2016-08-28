@@ -24,7 +24,7 @@
 
 \begin{document}
 
-\title{Detailed derivation of Belief Propagation algorithm \\ on Pairwise Markov Random Fields}
+\title{Detailed derivation of the Belief Propagation algorithm \\ on Pairwise Markov Random Fields}
 \author{Yurii Lahodiuk \\ yura.lagodiuk@gmail.com}
 \date{}
 \maketitle
@@ -75,10 +75,9 @@ For nodes, which are connected -- we, also interested in \lq \lq pairwise\rq \rq
 Calculation of values of marginal probabilities, by straightforward summations of probability mass function over all possible outcomes of the random variables (except the fixed one) -- leads to exponential complexity of computations:
 \begin{equation}
 \begin{split}
-   & O\left(\ |S(X_1)| \times |S(X_2)| \times \dots \times |S(X_{k-1})| \times |S(X_{k+1})| \times \dots \times |S(X_n)| \ \right) = O(\alpha^{n - 1}) = O(\alpha^n), \\
+   & O\left(\ |S(X_1)| \times |S(X_2)| \times \dots \times |S(X_{k-1})| \times |S(X_{k+1})| \times \dots \times |S(X_n)| \ \right) \\
    & \forall k \in I \cup J,\\
-   & \text{$\alpha$ -- is just some constant}, \\
-   & \text{$n$ -- is number of vertices in graph $G$}
+   & \text{$|S(X_k)|$ -- is a cardinality of the set of possible outcomes of the random variable $X_k$}
 \end{split}
 \end{equation}
 
@@ -628,7 +627,7 @@ Lets denote:
 \end{empheq}
 
 So, actually, it means, that given multipliers just corresponds to normalization coefficients (with respect to Equations \eqref{eq:sum_over_states_of_one_node_marginal_probabilities_b} and \eqref{eq:sum_over_states_of_two_node_marginal_probabilities_b}):
-\begin{empheq}[left=\empheqlbrace]{align}
+\begin{empheq}[left=\empheqlbrace]{align} \label{eq:equations_for_beliefs_calculations}
 \setlength{\jot}{10pt}
 \begin{split}
    b_{ij}(x_i, x_j) & = Z_{ij} \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \times \phi_i(x_i) \times \psi_{ij}(x_i, x_j) \times \phi_j(x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right), \\ 
@@ -640,7 +639,59 @@ So, actually, it means, that given multipliers just corresponds to normalization
 \end{split}
 \end{empheq}
 
-So, if we find a way to calculate appropriate values of $m_{k \rightarrow i}(x_i)$ ($\forall i \in I,\ \ \forall k \in N(i),\ \ \forall x_i \in S(X_i)$) and $m_{k \rightarrow j}(x_j)$ ($\forall j \in J,\ \ \forall k \in N(j),\ \ \forall x_j \in S(X_j)$) -- we will be able to calculate marginal probabilities $b_i(x_i)$ ($\forall i \in I,\ \ \forall x_i \in S(X_i)$) and $b_j(x_j)$ ($\forall j \in J,\ \ \forall x_j \in S(X_j)$).
+So, if we find a way to calculate appropriate values of $m_{k \rightarrow i}(x_i)$ ($\forall i \in I,\ \ \forall k \in N(i),\ \ \forall x_i \in S(X_i)$) and $m_{k \rightarrow j}(x_j)$ ($\forall j \in J,\ \ \forall k \in N(j),\ \ \forall x_j \in S(X_j)$) -- we will be able to calculate marginal probabilities $b_i(x_i)$ ($\forall i \in I,\ \ \forall x_i \in S(X_i)$) and $b_j(x_j)$ ($\forall j \in J,\ \ \forall x_j \in S(X_j)$). \\
+
+Let's rewrite the expressions for $b_i(x_i)$ and $b_j(x_j)$:
+
+\begin{equation} \label{eq:one_node_beliefs_rewritten_with_message}
+\begin{split}
+   b_i(x_i)           & = Z_i \times \phi_i(x_i) \times \highlight{m_{j \rightarrow i}(x_i)} \times \left( \prod_{\highlight{k \in N(i) \setminus j}} m_{k \rightarrow i}(x_i) \right) \\
+   b_j(x_j)           & = Z_j \times \phi_j(x_j) \times \highlightred{m_{i \rightarrow j}(x_j)} \times \left( \prod_{\highlightred{k \in N(j) \setminus i}} m_{k \rightarrow j}(x_j) \right)
+\end{split}
+\end{equation}
+
+On the other hand, according to Equations \eqref{eq:one_node_marginal_probabilities_from_two_node_marginal_probabilities_b}, we can define $b_i(x_i)$ and $b_j(x_j)$ through two-node marginal probabilities $b_{ij}(x_i, x_j)$ (taken from Equations \eqref{eq:equations_for_beliefs_calculations}):
+
+\begin{equation} \label{eq:one_node_beliefs_through_two_node_beliefs_1}
+\begin{split}
+b_i(x_i) & = \sum_{\highlight{x_j}} b_{ij}(x_i, x_j) = \sum_{\highlight{x_j}} \left( Z_{ij} \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \times \phi_i(x_i) \times \psi_{ij}(x_i, x_j) \times \phi_j(x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right) \right) \\
+b_j(x_j) & = \sum_{\highlightred{x_i}} b_{ij}(x_i, x_j) = \sum_{\highlightred{x_i}} \left( Z_{ij} \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \times \phi_i(x_i) \times \psi_{ij}(x_i, x_j) \times \phi_j(x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right) \right)  \\
+\end{split}
+\end{equation}
+
+Let's move-out the multipliers, which don't depend on $x_i$ and $x_j$:
+
+\begin{equation} \label{eq:one_node_beliefs_through_two_node_beliefs_2}
+\begin{split}
+b_i(x_i) & = Z_{ij} \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \times \phi_i(x_i) \times \sum_{\highlight{x_j}} \left( \phi_j(\highlight{x_j}) \times \psi_{ij}(x_i, \highlight{x_j}) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(\highlight{x_j}) \right) \right) \\
+b_j(x_j) & = Z_{ij} \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right) \times \phi_j(x_j) \times \sum_{\highlightred{x_i}} \left( \phi_i(\highlightred{x_i}) \times \psi_{ij}(\highlightred{x_i}, x_j) \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(\highlightred{x_i}) \right) \right)  \\
+\end{split}
+\end{equation}
+
+So, finally, from Equations \eqref{eq:one_node_beliefs_rewritten_with_message} and \eqref{eq:one_node_beliefs_through_two_node_beliefs_2} we can derive equations for $m_{j \rightarrow i}(x_i)$ and $m_{i \rightarrow j}(x_j)$:
+
+\begin{equation}
+\begin{split}
+& Z_i \times \highlight{\phi_i(x_i)} \times m_{j \rightarrow i}(x_i) \times \highlight{\left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right)} = \\
+& = Z_{ij} \times \highlight{\left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right)} \times \highlight{\phi_i(x_i)} \times \sum_{x_j} \left( \phi_j(x_j) \times \psi_{ij}(x_i, x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right) \right) 
+\end{split}
+\end{equation}
+
+We can reduce the same multipliers from the left and right parts, and, finally, obtain the equation for calculation of $m_{j \rightarrow i}(x_i)$:
+
+\begin{equation}
+\begin{split}
+m_{j \rightarrow i}(x_i) = {Z_{ij} \over Z_i} \times \sum_{x_j} \left( \phi_j(x_j) \times \psi_{ij}(x_i, x_j) \times \left( \prod_{k \in N(j) \setminus i} m_{k \rightarrow j}(x_j) \right) \right) 
+\end{split}
+\end{equation}
+
+Doing the similar manipulations, we can obtain the equation for $m_{i \rightarrow j}(x_j)$:
+
+\begin{equation}
+\begin{split}
+m_{i \rightarrow j}(x_j) = {Z_{ij} \over Z_j} \times \sum_{x_i} \left( \phi_i(x_i) \times \psi_{ij}(x_i, x_j) \times \left( \prod_{k \in N(i) \setminus j} m_{k \rightarrow i}(x_i) \right) \right) 
+\end{split}
+\end{equation}
 
 \begin{thebibliography}{20}
 
