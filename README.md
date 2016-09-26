@@ -9,3 +9,8 @@ PDF with detailed derivation of the algorithm for Pairwise Markov Random Fields 
 https://github.com/lagodiuk/java-belief-propagation/blob/master/derivation_of_belief_propagation_algorithm/Derivation.pdf
 
 Examples of the inference over the different Pairwise Markov Random Fields can be found in folder: *src/test/java/com/lahodiuk/bp/example/*
+
+## Reconstruction of the images ##
+![Scheme of the reconstruction using Pairwise Markov Random Field and Belief Propagation](https://raw.githubusercontent.com/lagodiuk/java-belief-propagation/master/img/image_reconstruction_scheme.png)
+
+For more details check the class: https://github.com/lagodiuk/java-belief-propagation/blob/master/src/main/java/com/lahodiuk/bp/example/ImageReconstruction.java
