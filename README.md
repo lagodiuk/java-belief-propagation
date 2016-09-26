@@ -14,3 +14,7 @@ Examples of the inference over the different Pairwise Markov Random Fields can b
 ![Scheme of the reconstruction using Pairwise Markov Random Field and Belief Propagation](https://raw.githubusercontent.com/lagodiuk/java-belief-propagation/master/img/image_reconstruction_scheme.png)
 
 For more details check the class: https://github.com/lagodiuk/java-belief-propagation/blob/master/src/main/java/com/lahodiuk/bp/example/ImageReconstruction.java
+
+![Example of reconstruction 2](https://raw.githubusercontent.com/lagodiuk/java-belief-propagation/master/img/image_reconstruction_2.gif)
+
+![Example of reconstruction 1](https://raw.githubusercontent.com/lagodiuk/java-belief-propagation/master/img/image_reconstruction_1.gif)
