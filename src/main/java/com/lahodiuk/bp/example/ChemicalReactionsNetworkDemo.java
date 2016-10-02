@@ -1,8 +1,8 @@
 package com.lahodiuk.bp.example;
 
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.lahodiuk.bp.Edge;
 import com.lahodiuk.bp.Node;
@@ -25,11 +26,12 @@ public class ChemicalReactionsNetworkDemo {
 	public static final int ITERATIONS_NUMBER = 10;
 
 	public static void main(String[] args) throws Exception {
-		// String path = "src/main/resources/HammingCode.txt";
-		String path = "src/main/resources/ChemicalReactionsNetwork.txt";
 
-		ReactionsNetwork reactionsNetwork = configureReactionsNetwork(
-				Files.readAllLines(Paths.get(path), Charset.forName("UTF-8")));
+		List<String> configuration = new BufferedReader(new InputStreamReader(
+				ChemicalReactionsNetworkDemo.class.getResourceAsStream("/ChemicalReactionsNetwork.txt"),
+				StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+
+		ReactionsNetwork reactionsNetwork = configureReactionsNetwork(configuration);
 
 		inference(reactionsNetwork, ITERATIONS_NUMBER);
 

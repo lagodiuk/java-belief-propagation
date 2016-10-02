@@ -29,7 +29,7 @@ public class ImageReconstruction {
 
 	public static void main(String[] args) throws Exception {
 
-		BufferedImage originalImg = ImageIO.read(new File("src/main/resources/input_3.png"));
+		BufferedImage originalImg = ImageIO.read(ImageReconstruction.class.getResourceAsStream("/input_3.png"));
 
 		UI ui = constructUI(originalImg, 2);
 
