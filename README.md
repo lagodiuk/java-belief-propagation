@@ -18,3 +18,14 @@ For more details check the class: https://github.com/lagodiuk/java-belief-propag
 ![Example of reconstruction 2](https://raw.githubusercontent.com/lagodiuk/java-belief-propagation/master/img/image_reconstruction_2.gif)
 
 ![Example of reconstruction 1](https://raw.githubusercontent.com/lagodiuk/java-belief-propagation/master/img/image_reconstruction_1.gif)
+
+### How to run an example of the image reconstruction ###
+
+Compile the library:
+```bash
+$ mvn clean install
+```
+Run an example:
+```bash
+$ java -cp "target/bp-1.0-SNAPSHOT.jar:target/lib/*" com.lahodiuk.bp.example.ImageReconstruction
+```
