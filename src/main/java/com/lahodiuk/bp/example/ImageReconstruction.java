@@ -24,7 +24,7 @@ import com.lahodiuk.bp.Potential;
 public class ImageReconstruction {
 
 	static final String PATH_TO_SAVE_IMAGES = "target/reconstructed_images";
-	static final boolean SAVE_IMAGES_ON_DISK = true;
+	static final boolean SAVE_IMAGES_ON_DISK = false;
 	static final int INFERENCE_ITERATIONS = 100;
 
 	public static void main(String[] args) throws Exception {
