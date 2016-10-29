@@ -51,6 +51,14 @@ public class Edge<STATES_OF_NODE_1, STATES_OF_NODE_2> {
 		return edge;
 	}
 
+	public Node<STATES_OF_NODE_1> getNode1() {
+		return this.node1;
+	}
+
+	public Node<STATES_OF_NODE_2> getNode2() {
+		return this.node2;
+	}
+
 	public <T> double getLogIncomingMessage(Node<T> node, T state) {
 		if (node == this.node1) {
 			return this.logNode2ToNode1Messages.get(state);
