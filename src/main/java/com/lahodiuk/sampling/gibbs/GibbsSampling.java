@@ -18,7 +18,7 @@ public abstract class GibbsSampling {
 		List<List<Object>> samples = new ArrayList<>();
 
 		PersistentTreeList<Object> vector = this.getInitialVector(rnd);
-		for (int s = 0; s < (samplesCount + warmUpCount); s++) {
+		for (int s = 0; s <= (samplesCount + warmUpCount); s++) {
 			for (int idx = 0; idx < this.getDimension(); idx++) {
 				Map<Object, Double> conditionalProbabilityDistribution = this.calculateConditionalProbabilityDistribution(vector, idx);
 				while (true) {
