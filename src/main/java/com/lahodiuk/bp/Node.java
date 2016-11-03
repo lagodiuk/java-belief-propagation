@@ -13,6 +13,11 @@ public abstract class Node<STATES> {
 
 	public abstract double getPriorProbablility(STATES state);
 
+	@SuppressWarnings("unchecked")
+	public double getPriorProbablilityNoTypeCheck(Object state) {
+		return this.getPriorProbablility((STATES) state);
+	}
+
 	private List<Edge<?, ?>> edges = new ArrayList<>();
 
 	public double getLogPriorProbablility(STATES state) {
@@ -80,5 +85,15 @@ public abstract class Node<STATES> {
 			}
 		}
 		return mostProbableState;
+	}
+
+	protected int index;
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return this.index;
 	}
 }

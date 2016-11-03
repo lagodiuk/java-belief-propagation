@@ -2,9 +2,7 @@ package com.lahodiuk.sampling.gibbs;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import com.lahodiuk.bp.Edge;
@@ -14,9 +12,6 @@ public class GibbsSamplingMRF extends GibbsSamplingOptimized {
 
 	@SuppressWarnings("rawtypes")
 	private final List<Node> nodes;
-
-	@SuppressWarnings("rawtypes")
-	private final Map<Node, Integer> nodeToNodeIdx;
 
 	private final Object[][] nodeIdxToStates;
 
@@ -35,12 +30,11 @@ public class GibbsSamplingMRF extends GibbsSamplingOptimized {
 			allNodesList.addAll(nodeContainer);
 		}
 		int nodesCnt = allNodesList.size();
-		this.nodeToNodeIdx = new HashMap<>(nodesCnt);
 		this.nodeIdxToStates = new Object[nodesCnt][];
 		for (int i = 0; i < nodesCnt; i++) {
 			Node<?> node = allNodesList.get(i);
-			this.nodeToNodeIdx.put(node, i);
 			this.nodeIdxToStates[i] = node.getStates().toArray();
+			node.setIndex(i);
 		}
 
 		this.nodes = allNodesList;
@@ -60,16 +54,16 @@ public class GibbsSamplingMRF extends GibbsSamplingOptimized {
 	public double conditionalProbability(int indexOfValueOfRandomVariable, int idx, int[] vector) {
 		Node<?> curr = this.nodes.get(idx);
 		Object currState = this.nodeIdxToStates[idx][indexOfValueOfRandomVariable];
-		double result = 1;
+		double result = curr.getPriorProbablilityNoTypeCheck(currState);
 		for (Edge<?, ?> e : curr.getEdges()) {
 			if (curr == e.getNode1()) {
 				Node<?> other = e.getNode2();
-				Integer otherIdx = this.nodeToNodeIdx.get(other);
+				int otherIdx = other.getIndex();
 				Object node2State = this.nodeIdxToStates[otherIdx][vector[otherIdx]];
 				result *= e.getPotential().getValueNoTypeCheck(currState, node2State);
 			} else {
 				Node<?> other = e.getNode1();
-				Integer otherIdx = this.nodeToNodeIdx.get(other);
+				int otherIdx = other.getIndex();
 				Object node1State = this.nodeIdxToStates[otherIdx][vector[otherIdx]];
 				result *= e.getPotential().getValueNoTypeCheck(node1State, currState);
 			}
@@ -124,7 +118,7 @@ public class GibbsSamplingMRF extends GibbsSamplingOptimized {
 	}
 
 	public Object getMostProbableState(@SuppressWarnings("rawtypes") Node node) {
-		int idx = this.nodeToNodeIdx.get(node);
+		int idx = node.getIndex();
 		double[] nodeMarginalProbabilities = this.marginalProbabilities.get(idx);
 		double maxProb = -1;
 		int maxProbIdx = -1;

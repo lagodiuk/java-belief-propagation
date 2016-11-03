@@ -27,7 +27,8 @@ public class ProductsGibbsSampling {
 		GibbsSamplingMRF gibbsSamplingMRF = new GibbsSamplingMRF(
 				edges, userIdToUser.values(), productIdToProduct.values());
 
-		gibbsSamplingMRF.infer(300, 1000, new Random(1));
+		gibbsSamplingMRF.infer(300, 1000, new Random(1), true);
+		System.out.println();
 
 		for (int userId : userIdToUser.keySet()) {
 			User user = userIdToUser.get(userId);

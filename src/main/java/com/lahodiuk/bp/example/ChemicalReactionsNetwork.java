@@ -3,7 +3,7 @@ package com.lahodiuk.bp.example;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +61,8 @@ public class ChemicalReactionsNetwork {
 				// Need some prior knowledge about at least one compound type
 				// (for unambiguous inference)
 				.setPriorCompoundState("H2O", CompoundType.WATER)
+				.setPriorCompoundState("KOH", CompoundType.BASE)
+				.setPriorCompoundState("NaOH", CompoundType.BASE)
 
 				.addReaction(new Reaction().reagents("Na2O", "H2O").products("NaOH"))
 				.addReaction(new Reaction().reagents("K2O", "H2O").products("KOH"))
@@ -186,7 +188,7 @@ public class ChemicalReactionsNetwork {
 
 		private Map<String, CompoundNode> compoundToCompoundNode = new TreeMap<>();
 
-		private List<Edge<?, ?>> edges = new ArrayList<>();
+		private List<Edge<CompoundType, Rule>> edges = new ArrayList<>();
 
 		public ReactionsNetwork addRule(Rule ruleVariant) {
 			this.rules.add(ruleVariant);
@@ -218,7 +220,7 @@ public class ChemicalReactionsNetwork {
 		}
 
 		private static <T> Set<List<T>> permutations(List<T> seq) {
-			Set<List<T>> resultsCollector = new HashSet<>();
+			Set<List<T>> resultsCollector = new LinkedHashSet<>();
 			permutations(new ArrayList<T>(seq),
 					new LinkedList<>(seq),
 					resultsCollector);
@@ -252,7 +254,7 @@ public class ChemicalReactionsNetwork {
 			}
 		}
 
-		private void buildNetwork() {
+		public void buildNetwork() {
 
 			this.processRules();
 
@@ -284,7 +286,7 @@ public class ChemicalReactionsNetwork {
 				int reagentsCount = rule.getReagentTypes().size();
 				Set<Rule> rulesWithSameNumberOfReagents = this.reagentsCountToRules.get(reagentsCount);
 				if (rulesWithSameNumberOfReagents == null) {
-					rulesWithSameNumberOfReagents = new HashSet<>();
+					rulesWithSameNumberOfReagents = new LinkedHashSet<>();
 				}
 				rulesWithSameNumberOfReagents.add(rule);
 				this.reagentsCountToRules.put(reagentsCount, rulesWithSameNumberOfReagents);
@@ -292,7 +294,7 @@ public class ChemicalReactionsNetwork {
 				int productsCount = rule.getProductTypes().size();
 				Set<Rule> rulesWithSameNumberOfProducts = this.productsCountToRules.get(productsCount);
 				if (rulesWithSameNumberOfProducts == null) {
-					rulesWithSameNumberOfProducts = new HashSet<>();
+					rulesWithSameNumberOfProducts = new LinkedHashSet<>();
 				}
 				rulesWithSameNumberOfProducts.add(rule);
 				this.productsCountToRules.put(productsCount, rulesWithSameNumberOfProducts);
@@ -326,7 +328,7 @@ public class ChemicalReactionsNetwork {
 			Set<Rule> mostProbableStatesByReagentsCount = this.reagentsCountToRules.get(reagentsCount);
 			Set<Rule> mostProbableStatesByProductsCount = this.productsCountToRules.get(productsCount);
 
-			Set<Rule> mostProbableRules = new HashSet<>();
+			Set<Rule> mostProbableRules = new LinkedHashSet<>();
 
 			// Intersection of sets
 			if ((mostProbableStatesByProductsCount != null) && (mostProbableStatesByReagentsCount != null)) {
@@ -375,14 +377,26 @@ public class ChemicalReactionsNetwork {
 		public CompoundType getMostProbableCompoundType(String compound) {
 			return this.compoundToCompoundNode.get(compound).getMostProbableState();
 		}
+
+		public Map<String, CompoundNode> getCompoundToCompoundNode() {
+			return this.compoundToCompoundNode;
+		}
+
+		public Map<Reaction, ReactionNode> getReactionToReactionNode() {
+			return this.reactionToReactionNode;
+		}
+
+		public List<Edge<CompoundType, Rule>> getEdges() {
+			return this.edges;
+		}
 	}
 
 	private static class CompoundNode extends Node<CompoundType> {
 
-		private static final double EPSILON = 1e-5;
+		private static final double EPSILON = 1e-9;
 
 		private static final Set<CompoundType> STATES =
-				new HashSet<>(Arrays.asList(CompoundType.values()));
+				new LinkedHashSet<>(Arrays.asList(CompoundType.values()));
 
 		private CompoundType mostProbableState;
 
